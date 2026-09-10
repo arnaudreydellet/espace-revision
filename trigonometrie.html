@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Trigonométrie — Mathématiques</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval (identiques aux autres pages)
+   ============================================================= */
+:root {
+  --se-blue:      #2F63F5;
+  --se-blue-700:  #244FCC;
+  --se-blue-300:  #93B4FD;
+  --se-blue-200:  #C6D4FD;
+  --se-blue-100:  #E6EDFF;
+  --se-blue-50:   #F3F6FE;
+  --se-ink:       #0B1526;
+  --se-ink-2:     #4A5878;
+  --se-ink-3:     #8A96B3;
+  --se-line:      #DDE4F2;
+  --se-line-2:    #E9EEF8;
+  --se-bg:        #F7F9FD;
+  --se-card:      #FFFFFF;
+
+  --r-card: 18px;
+  --r-btn:  12px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --math: 'Times New Roman', Times, serif;
+  --ease: cubic-bezier(.22,.8,.22,1);
+
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100dvh;
+  font-family: var(--font); color: var(--se-ink);
+  background: var(--se-bg); overflow-x: hidden;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(to right,  rgba(47,99,245,.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+          mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+.app {
+  position: relative; z-index: 1;
+  min-height: 100dvh; display: flex; flex-direction: column;
+  max-width: 1120px; margin: 0 auto;
+  padding: calc(16px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal));
+}
+@media (min-width: 760px) {
+  .app { padding: calc(26px + var(--sat)) calc(32px + var(--sar)) calc(24px + var(--sab)) calc(32px + var(--sal)); }
+}
+
+/* =============================================================
+   3. EN-TÊTE
+   ============================================================= */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 32px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+.retour {
+  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+  margin-top: 22px; min-height: 40px; padding: 0 4px;
+  color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none;
+  border-radius: 8px; transition: color .25s;
+}
+.retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
+.retour:hover { color: var(--se-blue); }
+.retour:hover svg { transform: translateX(-3px); }
+.retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+
+.hero { padding: 6px 0 20px; }
+@media (min-width: 760px) { .hero { padding: 10px 0 26px; } }
+.hero__context { margin: 0 0 8px; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+.hero h1 { margin: 0 0 8px; font-size: clamp(30px, 7vw, 46px); font-weight: 700; line-height: 1.05; letter-spacing: -.028em; }
+.hero__sub { margin: 0; max-width: 48ch; font-size: clamp(15px, 2vw, 17px); line-height: 1.5; color: var(--se-ink-2); }
+
+/* =============================================================
+   4. SECTION PRINCIPALE — le parcours de révision (deux cartes)
+   ============================================================= */
+.parcours { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 760px) { .parcours { grid-template-columns: 1fr 1fr; gap: 22px; } }
+
+.carte {
+  position: relative; display: flex; flex-direction: column;
+  background: var(--se-card);
+  border: 1px solid var(--se-blue-200); border-radius: var(--r-card);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 8px 22px -12px rgba(47,99,245,.18);
+  text-decoration: none; color: inherit; overflow: hidden;
+  transition: transform .45s var(--ease), box-shadow .45s var(--ease), border-color .35s;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.carte:hover, .carte:focus-visible {
+  transform: translateY(-3px); border-color: var(--se-blue-300);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 18px 34px -14px rgba(47,99,245,.26);
+}
+.carte:active { transform: translateY(-1px) scale(.995); transition-duration: .12s; }
+.carte:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+
+.carte__figure { position: relative; aspect-ratio: 2.4 / 1; background: var(--se-blue-50); border-bottom: 1px solid var(--se-line-2); }
+@media (min-width: 760px) { .carte__figure { aspect-ratio: 2.2 / 1; } }
+.carte__figure svg { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform .6s var(--ease); transform-origin: 50% 55%; }
+.carte:hover .carte__figure svg { transform: scale(1.02); }
+
+.carte__body { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px 20px; }
+@media (min-width: 760px) { .carte__body { padding: 22px 24px 24px; gap: 8px; } }
+.carte__step { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--se-blue); }
+.carte__body h2 { margin: 0; font-size: clamp(21px, 2.6vw, 25px); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; }
+.carte__body p  { margin: 0; font-size: 14px; line-height: 1.5; color: var(--se-ink-2); }
+.btn {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 9px;
+  margin-top: 10px; min-height: 46px; padding: 11px 18px;
+  border-radius: var(--r-btn); background: var(--se-blue); color: #fff;
+  font-weight: 600; font-size: 15px; transition: background .25s;
+}
+.btn svg { width: 17px; height: 17px; transition: transform .35s var(--ease); }
+.carte:hover .btn { background: var(--se-blue-700); }
+.carte:hover .btn svg, .carte:focus-visible .btn svg { transform: translateX(4px); }
+
+/* =============================================================
+   5. SECTION SECONDAIRE — les documents distribués (raccourcis)
+   ============================================================= */
+.docs { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--se-line); }
+@media (min-width: 760px) { .docs { margin-top: 38px; padding-top: 26px; } }
+.docs__titre { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+.docs__sub   { margin: 0 0 14px; font-size: 13.5px; color: var(--se-ink-3); }
+.docs__grille { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 560px) { .docs__grille { grid-template-columns: 1fr 1fr; gap: 12px; } }
+
+.doc {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px 12px 12px; min-height: 64px;
+  background: var(--se-card); border: 1px solid var(--se-line); border-radius: 14px;
+  text-decoration: none; color: inherit;
+  transition: border-color .25s, background .25s;
+  -webkit-tap-highlight-color: transparent;
+}
+.doc:hover, .doc:focus-visible { border-color: var(--se-blue-200); background: #FBFCFF; }
+.doc:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+.doc__icone {
+  flex: 0 0 40px; width: 40px; height: 40px; border-radius: 10px;
+  background: var(--se-bg); border: 1px solid var(--se-line-2);
+  display: grid; place-items: center; color: var(--se-ink-2);
+}
+.doc__icone svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.doc__texte { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.doc__titre { font-size: 14.5px; font-weight: 600; line-height: 1.25; }
+.doc__desc  { font-size: 12.5px; color: var(--se-ink-3); line-height: 1.35; }
+.doc__desc b { font-weight: 600; color: var(--se-ink-2); }
+.doc__action { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: var(--se-blue); white-space: nowrap; }
+.doc__action svg { width: 15px; height: 15px; transition: transform .3s var(--ease); }
+.doc:hover .doc__action svg { transform: translateX(3px); }
+@media (max-width: 400px) { .doc__action span { display: none; } }
+
+/* =============================================================
+   6. FIGURES — un seul mouvement continu par carte, calculé en JS
+   sur une sinusoïde du temps : aucune boucle qui redémarre.
+   ============================================================= */
+.fig-grid { fill: url(#gridpat); }
+.f-axis  { stroke: var(--se-ink-3); stroke-width: 1; }
+.f-head  { fill: var(--se-ink-3); }
+.f-line  { fill: none; stroke: var(--se-ink-2); stroke-width: 1.4; }
+.f-blue  { fill: none; stroke: var(--se-blue); stroke-width: 2; stroke-linecap: round; }
+.f-thin  { fill: none; stroke: var(--se-blue); stroke-width: 1.3; }
+.f-dash  { fill: none; stroke: var(--se-blue-300); stroke-width: 1; stroke-dasharray: 3 4; }
+.f-dot   { fill: var(--se-blue); }
+.f-lbl   { font-family: var(--math); font-style: italic; font-size: 13px; fill: var(--se-ink-2); }
+.f-lbl--b{ fill: var(--se-blue); }
+.f-num   { font-family: var(--math); font-size: 11px; fill: var(--se-ink-3); text-anchor: middle; }
+.f-enter { opacity: 0; }
+.js.is-ready .f-enter { animation: appear 1.2s ease .5s forwards; }
+@keyframes appear { to { opacity: 1; } }
+
+/* =============================================================
+   7. PIED, ENTRÉE, MOUVEMENT RÉDUIT
+   ============================================================= */
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 26px 2px 0; font-size: 12.5px; color: var(--se-ink-3); }
+
+.js .reveal { opacity: 0; transform: translateY(10px); }
+.js.is-ready .reveal { animation: rise .8s var(--ease) var(--d, 0ms) forwards; }
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .reveal { opacity: 1; transform: none; }
+  .draw { stroke-dashoffset: 0; }
+  .fade { opacity: 1; }
+  .carte:hover { transform: none; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="top reveal" style="--d:0ms">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true">
+        <rect x="0"   y="10" width="5" height="8"  rx="1.2" fill="#93B4FD"/>
+        <rect x="8.5" y="5"  width="5" height="13" rx="1.2" fill="#6091FA"/>
+        <rect x="17"  y="0"  width="5" height="18" rx="1.2" fill="#2F63F5"/>
+      </svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+
+  <a class="retour reveal" style="--d:40ms" href="maths.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Retour aux chapitres
+  </a>
+
+  <header class="hero">
+    <p class="hero__context reveal" style="--d:80ms">Mathématiques · Chapitre 01</p>
+    <h1 class="reveal" style="--d:140ms">Trigonométrie</h1>
+    <p class="hero__sub reveal" style="--d:200ms">Révise le chapitre et retrouve les documents distribués en cours.</p>
+  </header>
+
+  <!-- ===================== LE PARCOURS DE RÉVISION ===================== -->
+  <main class="parcours" aria-label="Parcours de révision">
+
+    <!-- ---------- Je révise le cours ---------- -->
+    <a class="carte reveal" style="--d:280ms" href="https://arnaudreydellet.github.io/support-de-cours-trigo/">
+      <div class="carte__figure" aria-hidden="true">
+        <svg viewBox="0 0 360 150" focusable="false">
+          <defs>
+            <pattern id="gridpat" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M20 0H0V20" fill="none" stroke="#2F63F5" stroke-opacity=".07" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect class="fig-grid" width="360" height="150"/>
+          <!-- Cercle trigonométrique : centre (180 ; 84), rayon 54 -->
+          <line class="f-axis" x1="96" y1="84" x2="264" y2="84"/>
+          <polygon class="f-head" points="264,80 272,84 264,88"/>
+          <line class="f-axis" x1="180" y1="146" x2="180" y2="26"/>
+          <polygon class="f-head" points="176,26 180,18 184,26"/>
+          <circle class="f-line" cx="180" cy="84" r="54"/>
+          <!-- Le rayon pivote lentement ; l'arc, le point et les projections l'accompagnent -->
+          <g class="f-enter" data-cercle>
+            <line class="f-dash" data-proj-v/>
+            <line class="f-dash" data-proj-h/>
+            <path class="f-thin" data-arc/>
+            <line class="f-blue" data-rayon x1="180" y1="84"/>
+            <circle class="f-dot" data-point r="3.4"/>
+            <text class="f-lbl f-lbl--b" data-lbl-a>α</text>
+            <text class="f-lbl" data-lbl-cos text-anchor="middle">cos α</text>
+            <text class="f-lbl" data-lbl-sin text-anchor="end">sin α</text>
+          </g>
+        </svg>
+      </div>
+      <div class="carte__body">
+        <span class="carte__step">ÉTAPE 1</span>
+        <h2>Je révise le cours</h2>
+        <p>Reprends les points essentiels du chapitre pas à pas.</p>
+        <span class="btn">Commencer la révision
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </div>
+    </a>
+
+    <!-- ---------- Je m'entraîne ---------- -->
+    <a class="carte reveal" style="--d:380ms" href="entrainement-trigonometrie.html">
+      <div class="carte__figure" aria-hidden="true">
+        <svg viewBox="0 0 360 150" focusable="false">
+          <rect class="fig-grid" width="360" height="150"/>
+          <!-- Un exercice : le triangle est posé ; l'arc de l'angle se souligne lentement,
+               et la réponse validée respire à peine -->
+          <g class="f-enter" transform="translate(48 26)">
+            <line class="f-line" x1="0"   y1="96" x2="120" y2="96"/>
+            <line class="f-line" x1="120" y1="96" x2="120" y2="16"/>
+            <line class="f-blue" x1="0"   y1="96" x2="120" y2="16"/>
+            <path class="f-line" d="M110 96 v-10 h10" stroke-width="1.2"/>
+            <path class="f-thin" data-arc2 d="M24 96 A24 24 0 0 0 20 82.7"/>
+            <text class="f-lbl f-lbl--b" data-lbl-a2 x="28" y="91">α</text>
+            <text class="f-num" style="font-size:12px" x="60" y="112">adjacent</text>
+            <text class="f-num" style="font-size:12px" x="138" y="60" text-anchor="start">opposé</text>
+          </g>
+          <g class="f-enter">
+            <text class="f-lbl" style="font-size:15px" x="232" y="104">cos α = <tspan style="font-style:normal">0,8</tspan></text>
+            <g data-coche transform="translate(328 99)">
+              <circle r="11" fill="#E6EDFF"/>
+              <path d="M-5 0 l3.5 3.5 L6 -4" fill="none" stroke="#2F63F5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="carte__body">
+        <span class="carte__step">ÉTAPE 2</span>
+        <h2>Je m’entraîne</h2>
+        <p>Entraîne-toi avec des exercices interactifs.</p>
+        <span class="btn">Commencer les exercices
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </div>
+    </a>
+
+  </main>
+
+  <!-- ===================== DOCUMENTS DISTRIBUÉS EN COURS ===================== -->
+  <section class="docs reveal" style="--d:480ms" aria-label="Documents du cours">
+    <h2 class="docs__titre">Besoin de retrouver tes feuilles ?</h2>
+    <p class="docs__sub">Retrouve les documents distribués en classe.</p>
+
+    <div class="docs__grille">
+      <!-- Lien vers le PDF du cours : remplacer le href quand le fichier est déposé -->
+      <a class="doc" href="pdf/trigonometrie-cours.pdf" target="_blank" rel="noopener">
+        <span class="doc__icone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></span>
+        <span class="doc__texte">
+          <span class="doc__titre">Consulter le cours</span>
+          <span class="doc__desc"><b>Version papier</b> · La fiche de cours distribuée en classe.</span>
+        </span>
+        <span class="doc__action"><span>Ouvrir le PDF</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </a>
+
+      <a class="doc" href="pdf/trigonometrie-exercices.pdf" target="_blank" rel="noopener">
+        <span class="doc__icone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13l2 2 4-4"/></svg></span>
+        <span class="doc__texte">
+          <span class="doc__titre">Consulter les exercices</span>
+          <span class="doc__desc"><b>Version papier</b> · Les exercices distribués avec le chapitre.</span>
+        </span>
+        <span class="doc__action"><span>Ouvrir le PDF</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <footer class="foot reveal" style="--d:560ms">
+    <span>Une application conçue par ton professeur.</span>
+    <span>Première Bac Pro · ERA · TEBE · TMA</span>
+  </footer>
+
+</div>
+
+<script>
+/* =============================================================
+   Les deux figures respirent en continu : chaque grandeur animée
+   est une fonction sinusoïdale du temps, donc sans début ni fin,
+   sans redémarrage. Une seule boucle, en pause hors écran, et un
+   rendu fixe si l'élève a demandé moins de mouvement.
+   ============================================================= */
+(function () {
+  'use strict';
+  const root = document.documentElement;
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('is-ready')));
+
+  const q = s => document.querySelector(s);
+  const set = (el, attrs) => { for (const k in attrs) el.setAttribute(k, attrs[k]); };
+  const fix = n => (+n).toFixed(2);
+
+  /* --- Carte 1 : le rayon oscille entre 22° et 68° sur 16 s --- */
+  const rayon = q('[data-rayon]');
+  const c1 = rayon && {
+    rayon, arc: q('[data-arc]'), pv: q('[data-proj-v]'), ph: q('[data-proj-h]'), pt: q('[data-point]'),
+    la: q('[data-lbl-a]'), lcos: q('[data-lbl-cos]'), lsin: q('[data-lbl-sin]'),
+    CX: 180, CY: 84, R: 54, AR: 22
+  };
+  function carte1(t) {
+    const { CX, CY, R, AR } = c1;
+    const a = (45 + 23 * Math.sin(t * Math.PI * 2 / 16)) * Math.PI / 180;
+    const px = CX + R * Math.cos(a), py = CY - R * Math.sin(a);
+    set(c1.rayon, { x2: fix(px), y2: fix(py) });
+    set(c1.pt,    { cx: fix(px), cy: fix(py) });
+    set(c1.pv,    { x1: fix(px), y1: fix(py), x2: fix(px), y2: CY });
+    set(c1.ph,    { x1: fix(px), y1: fix(py), x2: CX,      y2: fix(py) });
+    set(c1.arc,   { d: `M${CX + AR} ${CY} A${AR} ${AR} 0 0 0 ${fix(CX + AR * Math.cos(a))} ${fix(CY - AR * Math.sin(a))}` });
+    const am = a / 2;                                   // l'étiquette α au milieu de l'arc
+    set(c1.la,   { x: fix(CX + 30 * Math.cos(am) - 3), y: fix(CY - 30 * Math.sin(am) + 4) });
+    set(c1.lcos, { x: fix(px), y: CY + 16 });
+    set(c1.lsin, { x: CX - 6,  y: fix(py + 4) });
+  }
+
+  /* --- Carte 2 : l'arc de l'angle se souligne puis s'efface sur 12 s, la coche respire à peine --- */
+  const arc2 = q('[data-arc2]'), la2 = q('[data-lbl-a2]'), coche = q('[data-coche]');
+  const L2 = arc2 && arc2.getTotalLength ? arc2.getTotalLength() : 20;
+  if (arc2) arc2.style.strokeDasharray = L2;
+  function carte2(t) {
+    const p = (1 - Math.cos(t * Math.PI * 2 / 12)) / 2;       // 0 → 1 → 0, sans rupture
+    arc2.style.strokeDashoffset = fix(L2 * (1 - p));
+    arc2.style.opacity = fix(.35 + .65 * p);
+    la2.style.opacity  = fix(.45 + .55 * p);
+    const s = 1 + .04 * Math.sin(t * Math.PI * 2 / 6);
+    coche.setAttribute('transform', `translate(328 99) scale(${fix(s)})`);
+  }
+
+  const frame = t => { if (c1) carte1(t); if (arc2) carte2(t); };
+  frame(2.6);                                 // rendu initial (et unique en mouvement réduit)
+  if (reduceMotion) return;
+
+  let raf = null, visible = true, t0 = null;
+  const tick = ts => { if (t0 === null) t0 = ts; frame((ts - t0) / 1000 + 2.6); raf = requestAnimationFrame(tick); };
+  const start = () => { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(tick); };
+  const stop  = () => { if (raf) { cancelAnimationFrame(raf); raf = null; } };
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(es => { visible = es.some(e => e.isIntersecting); visible ? start() : stop(); }, { threshold: .05 })
+      .observe(q('.parcours'));
+  }
+  document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+  start();
+})();
+</script>
+</body>
+</html>

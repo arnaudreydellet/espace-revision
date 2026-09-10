@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Ton espace de révision — Stud'Éval</title>
+
+<!-- Police : Sora (une seule famille). Repli système si hors-ligne. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval
+   Bleu d'action = celui du logo et du design system (#2F63F5).
+   Le vert est réservé à « validé / réussi » : il n'apparaît pas ici.
+   ============================================================= */
+:root {
+  --se-blue:      #2F63F5;
+  --se-blue-700:  #244FCC;
+  --se-blue-300:  #93B4FD;
+  --se-blue-200:  #C6D4FD;
+  --se-blue-100:  #E6EDFF;
+  --se-blue-50:   #F3F6FE;
+  --se-ink:       #0B1526;
+  --se-ink-2:     #4A5878;
+  --se-ink-3:     #8A96B3;
+  --se-line:      #DDE4F2;
+  --se-line-2:    #E9EEF8;
+  --se-bg:        #F7F9FD;
+  --se-card:      #FFFFFF;
+
+  --r-card: 18px;
+  --r-btn:  12px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --math: 'Times New Roman', Times, serif;     /* lettres mathématiques : x, y, f */
+  --ease: cubic-bezier(.22,.8,.22,1);
+
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100dvh;
+  font-family: var(--font); color: var(--se-ink);
+  background: var(--se-bg);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+/* Trame millimétrée quasi invisible, qui s'efface vers le bas */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(to right,  rgba(47,99,245,.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+          mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+
+.app {
+  position: relative; z-index: 1;
+  min-height: 100dvh; display: flex; flex-direction: column;
+  max-width: 1120px; margin: 0 auto;
+  padding: calc(16px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal));
+}
+@media (min-width: 760px) {
+  .app { padding: calc(26px + var(--sat)) calc(32px + var(--sar)) calc(24px + var(--sab)) calc(32px + var(--sal)); }
+}
+
+/* =============================================================
+   3. EN-TÊTE
+   ============================================================= */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 32px; }
+/* Marque : symbole en barres + mot — remplaçable par studeval-logo-bleu.svg */
+.brand { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 6px 11px; border-radius: 999px;
+  background: var(--se-blue-100); color: var(--se-blue-700);
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+
+.hero { padding: 26px 0 18px; }
+@media (min-width: 760px) { .hero { padding: 40px 0 26px; } }
+.hero__context { margin: 0 0 8px; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+.hero h1 { margin: 0 0 10px; font-size: clamp(27px, 6.2vw, 42px); font-weight: 700; line-height: 1.08; letter-spacing: -.025em; }
+.hero__sub { margin: 0; max-width: 44ch; font-size: clamp(15px, 2vw, 17px); line-height: 1.5; color: var(--se-ink-2); }
+.hero__sub b { color: var(--se-ink); font-weight: 600; }
+
+/* =============================================================
+   4. LES DEUX CARTES
+   ============================================================= */
+.matieres { flex: 1; display: grid; grid-template-columns: 1fr; gap: 14px; align-content: start; }
+@media (min-width: 760px) { .matieres { grid-template-columns: 1fr 1fr; gap: 22px; } }
+
+.carte {
+  position: relative; display: flex; flex-direction: column;
+  background: var(--se-card);
+  border: 1px solid var(--se-line); border-radius: var(--r-card);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 6px 18px -10px rgba(11,21,38,.10);
+  text-decoration: none; color: inherit; overflow: hidden;
+  transition: transform .45s var(--ease), box-shadow .45s var(--ease), border-color .35s;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.carte:hover, .carte:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--se-blue-200);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 16px 32px -14px rgba(47,99,245,.22);
+}
+.carte:active { transform: translateY(-1px) scale(.995); transition-duration: .12s; }
+.carte:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+
+/* Zone graphique : même ratio que le viewBox du dessin, rien n'est rogné */
+.carte__figure {
+  position: relative; aspect-ratio: 2 / 1;
+  background: var(--se-blue-50);
+  border-bottom: 1px solid var(--se-line-2);
+}
+.carte__figure svg { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform .6s var(--ease); transform-origin: 50% 60%; }
+.carte:hover .carte__figure svg { transform: scale(1.02); }   /* le dessin se rapproche à peine */
+
+.carte__body { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px 20px; }
+@media (min-width: 760px) { .carte__body { padding: 22px 24px 24px; gap: 8px; } }
+.carte__body h2 { margin: 0; font-size: clamp(21px, 2.6vw, 25px); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; }
+.carte__body p  { margin: 0; font-size: 14px; line-height: 1.5; color: var(--se-ink-2); }
+
+.btn {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 9px;
+  margin-top: 10px; min-height: 46px; padding: 11px 18px;
+  border-radius: var(--r-btn); background: var(--se-blue); color: #fff;
+  font-weight: 600; font-size: 15px; letter-spacing: -.005em;
+  transition: background .25s;
+}
+.btn svg { width: 17px; height: 17px; transition: transform .35s var(--ease); }
+.carte:hover .btn { background: var(--se-blue-700); }
+.carte:hover .btn svg, .carte:focus-visible .btn svg { transform: translateX(4px); }
+
+/* =============================================================
+   5. MATHÉMATIQUES — une courbe qui se trace dans un repère
+   ============================================================= */
+.fig-grid  { fill: url(#gridpat); }
+.m-axis    { fill: none; stroke: var(--se-ink-2); stroke-width: 1.2; }
+.m-head    { fill: var(--se-ink-2); }
+.m-tick    { stroke: var(--se-ink-3); stroke-width: 1; }
+.m-num     { font-family: var(--math); font-size: 11px; fill: var(--se-ink-3); text-anchor: middle; }
+.m-lbl     { font-family: var(--math); font-style: italic; font-size: 14px; fill: var(--se-ink-2); }
+.m-lbl--f  { fill: var(--se-blue); }
+.m-curve   { fill: none; stroke: var(--se-blue); stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 700; stroke-dashoffset: 700; }
+.js.is-ready .m-curve { animation: draw 2.2s var(--ease) .45s forwards; }
+/* Le point et ses deux projections apparaissent une fois la courbe tracée */
+.m-follow  { opacity: 0; }
+.js.is-ready .m-follow { animation: appear .7s ease 2.6s forwards; }
+.m-proj    { stroke: var(--se-blue-300); stroke-width: 1; stroke-dasharray: 3 4; }
+.m-pt      { fill: var(--se-blue); }
+.m-ring    { fill: none; stroke: var(--se-blue); stroke-width: 1; opacity: .35; }
+.m-coord   { font-family: var(--math); font-size: 12px; fill: var(--se-blue-700); }   /* lettres en italique, parenthèses droites */
+.m-coord .i { font-style: italic; }
+
+/* =============================================================
+   6. PHYSIQUE-CHIMIE — une onde sinusoïdale qui se propage
+   ============================================================= */
+.p-axis    { stroke: var(--se-ink-3); stroke-width: 1; }
+.p-head    { fill: var(--se-ink-3); }
+.p-wave    { fill: none; stroke: var(--se-blue); stroke-width: 2.2; stroke-linecap: round; }
+.p-wave-2  { fill: none; stroke: var(--se-blue-200); stroke-width: 1.4; }
+.p-tick    { stroke: var(--se-ink-3); stroke-width: 1; }
+.p-lbl     { font-family: var(--math); font-style: italic; font-size: 14px; fill: var(--se-ink-2); }
+.p-enter   { opacity: 0; }
+.js.is-ready .p-enter { animation: appear 1.4s ease .6s forwards; }
+
+@keyframes draw   { to { stroke-dashoffset: 0; } }
+@keyframes appear { to { opacity: 1; } }
+
+/* =============================================================
+   7. PIED
+   ============================================================= */
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 22px 2px 0; font-size: 12.5px; color: var(--se-ink-3); }
+
+/* =============================================================
+   8. ENTRÉE ORCHESTRÉE — une seule séquence
+   ============================================================= */
+.js .reveal { opacity: 0; transform: translateY(10px); }
+.js.is-ready .reveal { animation: rise .8s var(--ease) var(--d, 0ms) forwards; }
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+/* =============================================================
+   9. MOUVEMENT RÉDUIT — tout est visible, rien ne bouge
+   ============================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .reveal { opacity: 1; transform: none; }
+  .m-curve { stroke-dashoffset: 0; }
+  .m-follow, .p-enter { opacity: 1; }
+  .carte:hover { transform: none; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <!-- ===================== BARRE HAUTE ===================== -->
+  <div class="top reveal" style="--d:0ms">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true">
+        <rect x="0"   y="10" width="5" height="8"  rx="1.2" fill="#93B4FD"/>
+        <rect x="8.5" y="5"  width="5" height="13" rx="1.2" fill="#6091FA"/>
+        <rect x="17"  y="0"  width="5" height="18" rx="1.2" fill="#2F63F5"/>
+      </svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+
+  <!-- ===================== EN-TÊTE ===================== -->
+  <header class="hero">
+    <p class="hero__context reveal" style="--d:60ms">ERA · TEBE · TMA</p>
+    <h1 class="reveal" style="--d:120ms">Ton espace de révision</h1>
+    <p class="hero__sub reveal" style="--d:200ms"><b>Maths &amp; Physique-Chimie.</b> Choisis la matière que tu veux travailler.</p>
+  </header>
+
+  <!-- ===================== LES DEUX MATIÈRES ===================== -->
+  <main class="matieres" aria-label="Choisir une matière">
+
+    <!-- ---------- MATHÉMATIQUES ---------- -->
+    <a class="carte reveal" style="--d:300ms" href="maths.html">
+      <div class="carte__figure" aria-hidden="true">
+        <svg viewBox="0 0 360 180" focusable="false">
+          <defs>
+            <pattern id="gridpat" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M20 0H0V20" fill="none" stroke="#2F63F5" stroke-opacity=".07" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect class="fig-grid" width="360" height="180"/>
+
+          <!-- Repère -->
+          <line class="m-axis" x1="30" y1="140" x2="330" y2="140"/>
+          <polygon class="m-head" points="330,136 338,140 330,144"/>
+          <line class="m-axis" x1="50" y1="160" x2="50" y2="30"/>
+          <polygon class="m-head" points="46,30 50,22 54,30"/>
+          <text class="m-lbl" x="330" y="158">x</text>
+          <text class="m-lbl" x="38" y="34" text-anchor="end">y</text>
+          <g class="m-tick">
+            <line x1="110" y1="137" x2="110" y2="143"/><line x1="170" y1="137" x2="170" y2="143"/>
+            <line x1="230" y1="137" x2="230" y2="143"/><line x1="290" y1="137" x2="290" y2="143"/>
+            <line x1="47" y1="100" x2="53" y2="100"/><line x1="47" y1="60" x2="53" y2="60"/>
+          </g>
+          <text class="m-num" x="110" y="155">1</text>
+          <text class="m-num" x="170" y="155">2</text>
+          <text class="m-num" x="230" y="155">3</text>
+          <text class="m-num" x="290" y="155">4</text>
+
+          <!-- La courbe de f, tracée de gauche à droite -->
+          <path class="m-curve" data-curve d="M50 120 C 100 120, 120 52, 170 60 S 246 138, 296 92 S 326 44, 334 42"/>
+          <text class="m-lbl m-lbl--f" x="318" y="34">f</text>
+
+          <!-- Le point (x ; f(x)) qui parcourt la courbe, ses projections suivent -->
+          <g class="m-follow">
+            <line class="m-proj" data-proj-v x1="0" y1="0" x2="0" y2="0"/>
+            <line class="m-proj" data-proj-h x1="0" y1="0" x2="0" y2="0"/>
+            <circle class="m-ring" data-ring r="7"/>
+            <circle class="m-pt"   data-pt   r="3.4"/>
+            <text class="m-coord"  data-coord>(<tspan class="i">x</tspan> ; <tspan class="i">f</tspan>(<tspan class="i">x</tspan>))</text>
+          </g>
+        </svg>
+      </div>
+      <div class="carte__body">
+        <h2>Mathématiques</h2>
+        <p>Fonctions · Calcul · Statistiques · Géométrie</p>
+        <span class="btn">Réviser les maths
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </div>
+    </a>
+
+    <!-- ---------- PHYSIQUE-CHIMIE ---------- -->
+    <a class="carte reveal" style="--d:420ms" href="physique.html">
+      <div class="carte__figure" aria-hidden="true">
+        <svg viewBox="0 0 360 180" focusable="false">
+          <rect class="fig-grid" width="360" height="180"/>
+
+          <!-- Axe du temps -->
+          <line class="p-axis" x1="30" y1="90" x2="330" y2="90"/>
+          <polygon class="p-head" points="330,86 338,90 330,94"/>
+          <text class="p-lbl" x="330" y="110">t</text>
+
+          <!-- L'onde : une seconde onde discrète, puis la principale (tracés calculés en JS) -->
+          <g class="p-enter">
+            <path class="p-wave-2" data-wave-2 d=""/>
+            <path class="p-wave"   data-wave   d=""/>
+          </g>
+        </svg>
+      </div>
+      <div class="carte__body">
+        <h2>Physique-Chimie</h2>
+        <p>Énergie · Ondes · Électricité · Matière</p>
+        <span class="btn">Réviser la physique-chimie
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </div>
+    </a>
+
+  </main>
+
+  <!-- ===================== PIED ===================== -->
+  <footer class="foot reveal" style="--d:520ms">
+    <span>Une application conçue par ton professeur.</span>
+    <span>Première Bac Pro · ERA · TEBE · TMA</span>
+  </footer>
+
+</div>
+
+<script>
+/* =============================================================
+   COMPORTEMENTS
+   Deux animations continues, une par carte, chacune dans une
+   boucle unique, mise en pause hors écran ou onglet masqué, et
+   figée si l'élève a demandé moins de mouvement.
+   Raccordement futur : maths.html et physique.html.
+   ============================================================= */
+(function () {
+  'use strict';
+  const root = document.documentElement;
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Entrée orchestrée, après le premier rendu */
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('is-ready')));
+
+  /* Petit moteur commun : une boucle rAF par figure, arrêtée hors écran */
+  function loop(figure, frame) {
+    let raf = null, visible = true, t0 = null;
+    const tick = ts => { if (t0 === null) t0 = ts; frame((ts - t0) / 1000); raf = requestAnimationFrame(tick); };
+    const start = () => { if (!raf && !reduceMotion && visible && !document.hidden) raf = requestAnimationFrame(tick); };
+    const stop  = () => { if (raf) { cancelAnimationFrame(raf); raf = null; } };
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : stop(); }, { threshold: .05 }).observe(figure);
+    }
+    document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+    frame(0);            // premier rendu (et rendu unique en mouvement réduit)
+    start();
+  }
+
+  /* --- MATHS : le point (x ; f(x)) parcourt lentement la courbe --- */
+  const curve = document.querySelector('[data-curve]');
+  if (curve && curve.getTotalLength) {
+    const svg = curve.ownerSVGElement;
+    const q = s => svg.querySelector(s);
+    const pv = q('[data-proj-v]'), ph = q('[data-proj-h]'), ring = q('[data-ring]'), pt = q('[data-pt]'), coord = q('[data-coord]');
+    const L = curve.getTotalLength();
+    const X_AXIS_Y = 140, Y_AXIS_X = 50;       // position des axes (voir le SVG)
+    const PERIOD = 18;                          // secondes pour un aller-retour complet
+    const easeInOut = u => u < .5 ? 2*u*u : 1 - Math.pow(-2*u + 2, 2) / 2;
+
+    loop(curve.closest('.carte__figure'), t => {
+      // aller-retour doux entre 8 % et 96 % de la courbe
+      const u = (t % PERIOD) / PERIOD;
+      const back = u > .5;
+      const k = easeInOut(back ? (1 - u) * 2 : u * 2);
+      const p = curve.getPointAtLength(L * (.08 + .88 * k));
+      const x = p.x.toFixed(2), y = p.y.toFixed(2);
+      pt.setAttribute('cx', x);   pt.setAttribute('cy', y);
+      ring.setAttribute('cx', x); ring.setAttribute('cy', y);
+      pv.setAttribute('x1', x); pv.setAttribute('y1', y); pv.setAttribute('x2', x); pv.setAttribute('y2', X_AXIS_Y);
+      ph.setAttribute('x1', x); ph.setAttribute('y1', y); ph.setAttribute('x2', Y_AXIS_X); ph.setAttribute('y2', y);
+      // l'étiquette se tient au-dessus du point, et bascule à gauche près du bord droit
+      const left = p.x > 262;
+      coord.setAttribute('x', (p.x + (left ? -10 : 10)).toFixed(2));
+      coord.setAttribute('y', (p.y - 12).toFixed(2));
+      coord.setAttribute('text-anchor', left ? 'end' : 'start');
+    });
+  }
+
+  /* --- PHYSIQUE : une onde qui se propage vers la droite --- */
+  const wave = document.querySelector('[data-wave]');
+  const wave2 = document.querySelector('[data-wave-2]');
+  if (wave && wave2) {
+    const X0 = 30, X1 = 330, Y = 90, A = 34, LAMBDA = 100, STEP = 3;
+    const build = (phase, amp) => {
+      let d = '';
+      for (let x = X0; x <= X1; x += STEP) {
+        const y = Y - amp * Math.sin((x - X0) / LAMBDA * Math.PI * 2 - phase);
+        d += (x === X0 ? 'M' : 'L') + x + ' ' + y.toFixed(2);
+      }
+      return d;
+    };
+    loop(wave.closest('.carte__figure'), t => {
+      const phase = t * 0.9;                     // rad/s : lent et régulier
+      wave.setAttribute('d',  build(phase, A));
+      wave2.setAttribute('d', build(phase - 2.2, A * .5));
+    });
+  }
+})();
+</script>
+</body>
+</html>

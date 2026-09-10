@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Exercice 3 — Sinus ou cosinus ?</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval
+   ============================================================= */
+:root {
+  --se-blue: #2F63F5; --se-blue-700: #244FCC; --se-blue-300: #93B4FD; --se-blue-200: #C6D4FD;
+  --se-blue-100: #E6EDFF; --se-blue-50: #F3F6FE;
+  --se-ink: #0B1526; --se-ink-2: #4A5878; --se-ink-3: #8A96B3;
+  --se-line: #DDE4F2; --se-line-2: #E9EEF8; --se-bg: #F7F9FD; --se-card: #FFFFFF;
+  --se-ok: #1B9E5A; --se-ok-700: #157A46; --se-ok-100: #DFF5E8;
+  --se-err: #D9534F; --se-err-100: #FDECEC;
+  --r-card: 18px; --r-btn: 12px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --math: 'Times New Roman', Times, serif;
+  --ease: cubic-bezier(.22,.8,.22,1);
+  --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE ET COQUILLE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100dvh; font-family: var(--font); color: var(--se-ink); background: var(--se-bg); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(to right, rgba(47,99,245,.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+.app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; max-width: 760px; margin: 0 auto;
+  padding: calc(16px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal)); }
+@media (min-width: 760px) { .app { padding: calc(26px + var(--sat)) calc(32px + var(--sar)) calc(24px + var(--sab)) calc(32px + var(--sal)); } }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 32px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.retour { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin-top: 18px; min-height: 40px; padding: 0 4px; color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none; border-radius: 8px; transition: color .25s; }
+.retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
+.retour:hover { color: var(--se-blue); } .retour:hover svg { transform: translateX(-3px); }
+.retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+.contexte { margin: 10px 0 0; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+
+.cadre { margin-top: 12px; background: var(--se-card); border: 1px solid var(--se-line); border-radius: var(--r-card); box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 8px 22px -14px rgba(11,21,38,.12); padding: 20px 18px 22px; }
+@media (min-width: 560px) { .cadre { padding: 26px 28px 28px; } }
+.ecran { display: none; } .ecran.actif { display: block; animation: rise .45s var(--ease); }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+h1, h2 { margin: 0; letter-spacing: -.02em; line-height: 1.15; }
+h1 { font-size: clamp(22px, 5.4vw, 30px); font-weight: 700; } h2 { font-size: clamp(22px, 5.4vw, 28px); font-weight: 700; }
+.texte { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--se-ink-2); } .texte b { color: var(--se-ink); font-weight: 600; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 12px 20px; border: 0; border-radius: var(--r-btn); background: var(--se-blue); color: #fff; font: inherit; font-weight: 600; font-size: 15.5px; cursor: pointer; text-decoration: none; transition: background .25s, transform .3s var(--ease); -webkit-tap-highlight-color: transparent; }
+.btn svg { width: 17px; height: 17px; } .btn:hover { background: var(--se-blue-700); } .btn:active { transform: scale(.985); }
+.btn:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+.btn--secondaire { background: var(--se-card); color: var(--se-blue); border: 1px solid var(--se-blue-200); } .btn--secondaire:hover { background: var(--se-blue-50); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; } @media (max-width: 480px) { .actions .btn { flex: 1 1 100%; } }
+.intro h1 { margin-bottom: 12px; } .intro .texte + .texte { margin-top: 10px; }
+.rappel { display: flex; gap: 12px; align-items: flex-start; margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: var(--se-blue-50); border: 1px solid var(--se-blue-200); }
+.rappel p { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--se-ink-2); } .rappel b { color: var(--se-ink); font-weight: 600; }
+
+.progression { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.progression__ligne { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--se-ink-2); } .progression__ligne span:last-child { color: var(--se-ink-3); font-weight: 500; }
+.barre { height: 6px; border-radius: 999px; background: var(--se-blue-100); overflow: hidden; } .barre > span { display: block; height: 100%; width: 0; border-radius: 999px; background: var(--se-blue); transition: width .5s var(--ease); }
+
+.message { display: flex; gap: 12px; align-items: flex-start; padding: 13px 15px; border-radius: 12px; border: 1px solid transparent; animation: rise .35s var(--ease); }
+.message__icone { flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; }
+.message__icone svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.message p { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--se-ink-2); } .message p b { display: block; margin-bottom: 2px; font-size: 15px; }
+.message--juste { background: var(--se-ok-100); border-color: #BFE8D0; } .message--juste .message__icone { background: var(--se-ok); color: #fff; } .message--juste p b { color: var(--se-ok-700); }
+.message--aide { background: var(--se-blue-50); border-color: var(--se-blue-200); } .message--aide .message__icone { background: var(--se-blue-100); color: var(--se-blue-700); } .message--aide p b { color: var(--se-blue-700); }
+
+/* =============================================================
+   3. TRIANGLE
+   ============================================================= */
+.consigne { margin: 0 0 4px; font-size: clamp(17px, 4.4vw, 21px); font-weight: 600; line-height: 1.3; }
+.sous-consigne { margin: 0 0 6px; font-size: 13.5px; color: var(--se-ink-3); }
+.scene { margin: 0 -6px; transition: opacity .25s ease, transform .25s ease; } .scene.sortie { opacity: 0; transform: translateY(6px); }
+.scene svg { display: block; width: 100%; height: auto; }
+.trait { fill: none; stroke: var(--se-ink); stroke-width: 3; stroke-linecap: round; }
+.trait.cherche { stroke: var(--se-blue); }
+.angle-droit { fill: none; stroke: var(--se-ink-2); stroke-width: 1.8; stroke-linejoin: round; }
+.arc { fill: none; stroke: var(--se-blue); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 200; stroke-dashoffset: 200; animation: draw .7s var(--ease) .15s forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.mesure { font-family: var(--font); font-weight: 600; font-size: 24px; fill: var(--se-ink); text-anchor: middle; dominant-baseline: central; }
+.mesure.inconnue { fill: var(--se-blue); font-size: 30px; }
+.mesure.angle { fill: var(--se-blue); font-size: 22px; }
+.sommet { font-family: var(--math); font-style: italic; font-size: 22px; fill: var(--se-ink-3); text-anchor: middle; dominant-baseline: central; }
+
+/* =============================================================
+   4. LES DEUX CARTES DE FORMULE
+   ============================================================= */
+.question { margin: 10px 0 12px; font-size: 16px; font-weight: 600; }
+.choix { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 560px) { .choix { grid-template-columns: 1fr 1fr; } }
+.choix__btn {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  min-height: 118px; padding: 16px; border-radius: 16px; border: 1.5px solid var(--se-line);
+  background: var(--se-card); cursor: pointer; font: inherit; color: inherit;
+  transition: border-color .3s, background .3s, transform .3s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.choix__btn:hover { border-color: var(--se-blue-200); background: var(--se-blue-50); }
+.choix__btn:active { transform: scale(.99); }
+.choix__btn:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+.choix__btn.faux { border-color: var(--se-err); background: var(--se-err-100); }
+.choix__btn.juste { border-color: var(--se-ok); background: var(--se-ok-100); }
+.choix__btn[disabled] { cursor: default; opacity: .55; }
+.choix__btn.juste[disabled] { opacity: 1; }
+.choix__nom { font-size: 12.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--se-blue-700); }
+.choix__btn.juste .choix__nom { color: var(--se-ok-700); }
+.choix__formule { display: flex; align-items: center; justify-content: center; gap: 10px; font-family: var(--math); font-size: 26px; color: var(--se-ink); }
+.choix__formule .fn { font-style: normal; } .choix__formule i { font-style: italic; }
+.frac { display: inline-flex; flex-direction: column; align-items: center; }
+.frac > .num { border-bottom: 2.5px solid currentColor; padding: 0 8px 5px; }
+.frac > .den { padding: 5px 8px 0; }
+.mot { font-family: var(--font); font-size: 13px; font-weight: 600; color: var(--se-ink-2); }
+
+.suite { margin-top: 14px; display: none; } .suite.visible { display: flex; }
+.retour-eleve { margin-top: 12px; }
+
+/* --- Bilan ---------------------------------------------------- */
+.fin h2 { margin-bottom: 18px; }
+.bilan { display: grid; grid-template-columns: 1fr; gap: 10px; } @media (min-width: 480px) { .bilan { grid-template-columns: 1fr 1fr; } }
+.bilan__carte { padding: 16px 18px; border-radius: 12px; border: 1px solid var(--se-line); background: var(--se-bg); }
+.bilan__carte--ok { background: var(--se-ok-100); border-color: #BFE8D0; }
+.bilan__nombre { display: block; font-size: 32px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+.bilan__carte--ok .bilan__nombre { color: var(--se-ok-700); } .bilan__carte--aide .bilan__nombre { color: var(--se-blue-700); }
+.bilan__libelle { display: block; margin-top: 6px; font-size: 13.5px; color: var(--se-ink-2); line-height: 1.4; }
+.fin .texte { margin-top: 14px; }
+
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 22px 2px 0; font-size: 12.5px; color: var(--se-ink-3); }
+.js .reveal { opacity: 0; transform: translateY(10px); } .js.is-ready .reveal { animation: rise .8s var(--ease) var(--d, 0ms) forwards; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .reveal { opacity: 1; transform: none; } .arc { stroke-dashoffset: 0; } .scene.sortie { opacity: 1; transform: none; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <div class="top reveal" style="--d:0ms">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true"><rect x="0" y="10" width="5" height="8" rx="1.2" fill="#93B4FD"/><rect x="8.5" y="5" width="5" height="13" rx="1.2" fill="#6091FA"/><rect x="17" y="0" width="5" height="18" rx="1.2" fill="#2F63F5"/></svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+  <a class="retour reveal" style="--d:40ms" href="trigonometrie.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Retour à la trigonométrie
+  </a>
+  <p class="contexte reveal" style="--d:80ms">Trigonométrie · Je m’entraîne · Exercice 3</p>
+
+  <main class="cadre reveal" style="--d:140ms">
+
+    <!-- ===================== INTRODUCTION ===================== -->
+    <section class="ecran intro actif" id="ecran-intro" aria-labelledby="titre-intro">
+      <h1 id="titre-intro">Sinus ou cosinus ?</h1>
+      <p class="texte">Observe les côtés connus et la longueur recherchée, puis choisis la formule adaptée.</p>
+      <div class="rappel">
+        <p><b>Pas besoin de calculer :</b> ici, tu dois seulement choisir la bonne formule. Regarde le côté que tu connais, celui que tu cherches, et demande-toi quelle formule relie ces deux côtés.</p>
+      </div>
+      <div class="actions">
+        <button class="btn" type="button" id="btn-commencer">Commencer
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== QUESTION ===================== -->
+    <section class="ecran" id="ecran-question">
+      <div class="progression">
+        <div class="progression__ligne"><span id="prog-texte">Question 1 sur 10</span><span>Exercice 3</span></div>
+        <div class="barre" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" id="prog-barre"><span></span></div>
+      </div>
+      <p class="consigne">Quelle formule permet de calculer la longueur indiquée par <span style="color:var(--se-blue)">?</span></p>
+      <p class="sous-consigne" id="sous-consigne"></p>
+      <div class="scene" id="scene"></div>
+      <div class="choix" id="choix"></div>
+      <div class="retour-eleve" id="retour-eleve" aria-live="polite"></div>
+      <div class="suite" id="suite">
+        <button class="btn" type="button" id="btn-suivant">Question suivante
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== FIN ===================== -->
+    <section class="ecran fin" id="ecran-fin" aria-labelledby="titre-fin">
+      <h2 id="titre-fin">Exercice terminé</h2>
+      <div class="bilan">
+        <div class="bilan__carte bilan__carte--ok"><span class="bilan__nombre" id="bilan-ok">0 / 10</span><span class="bilan__libelle">choisies correctement du premier coup</span></div>
+        <div class="bilan__carte bilan__carte--aide"><span class="bilan__nombre" id="bilan-aide">0</span><span class="bilan__libelle">trouvées après une aide</span></div>
+      </div>
+      <p class="texte" id="bilan-phrase"></p>
+      <div class="actions">
+        <button class="btn" type="button" id="btn-recommencer">Recommencer</button>
+        <a class="btn btn--secondaire" href="trigonometrie.html">Retour à la trigonométrie</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot reveal" style="--d:240ms">
+    <span>Une application conçue par ton professeur.</span>
+    <span>Première Bac Pro · ERA · TEBE · TMA</span>
+  </footer>
+</div>
+
+<script>
+/* =============================================================
+   EXERCICE 3 — Sinus ou cosinus ? (aucun calcul)
+   A. Données   B. Modèle (formule déduite des deux côtés concernés)
+   C. Rendu du triangle   D. Déroulé   E. Bilan
+   ============================================================= */
+(function () {
+'use strict';
+
+/* ------------------------------------------------------------
+   A. DONNÉES — une situation = un angle, un côté connu et sa valeur,
+   un côté cherché, une orientation (theta) et le sommet portant α.
+   Les quatre cas sont équilibrés (2 ou 3 questions chacun).
+   ------------------------------------------------------------ */
+const SITUATIONS = [
+  // CAS 1 — hypoténuse connue, côté opposé cherché → sinus
+  { angle: 35, connu: 'hypotenuse', valeur: 8,   cherche: 'oppose',     theta: 0,   ref: 'P' },
+  { angle: 51, connu: 'hypotenuse', valeur: 11,  cherche: 'oppose',     theta: 135, ref: 'Q' },
+  { angle: 44, connu: 'hypotenuse', valeur: 6.5, cherche: 'oppose',     theta: 270, ref: 'Q' },
+  // CAS 2 — côté opposé connu, hypoténuse cherchée → sinus
+  { angle: 28, connu: 'oppose',     valeur: 4,   cherche: 'hypotenuse', theta: 90,  ref: 'Q' },
+  { angle: 62, connu: 'oppose',     valeur: 9,   cherche: 'hypotenuse', theta: 180, ref: 'P' },
+  // CAS 3 — hypoténuse connue, côté adjacent cherché → cosinus
+  { angle: 51, connu: 'hypotenuse', valeur: 10,  cherche: 'adjacent',   theta: 90,  ref: 'P' },
+  { angle: 33, connu: 'hypotenuse', valeur: 7,   cherche: 'adjacent',   theta: 315, ref: 'P' },
+  { angle: 47, connu: 'hypotenuse', valeur: 12,  cherche: 'adjacent',   theta: 180, ref: 'Q' },
+  // CAS 4 — côté adjacent connu, hypoténuse cherchée → cosinus
+  { angle: 42, connu: 'adjacent',   valeur: 6,   cherche: 'hypotenuse', theta: 0,   ref: 'Q' },
+  { angle: 38, connu: 'adjacent',   valeur: 7.5, cherche: 'hypotenuse', theta: 270, ref: 'P' },
+];
+const NB = SITUATIONS.length;
+const ROLE = { adjacent: 'côté adjacent', oppose: 'côté opposé', hypotenuse: 'hypoténuse' };
+const article = r => r === 'hypotenuse' ? 'l’hypoténuse' : `le ${ROLE[r]}`;
+
+/* ------------------------------------------------------------
+   B. MODÈLE — la formule se déduit des DEUX CÔTÉS CONCERNÉS,
+   jamais de la position graphique.
+   ------------------------------------------------------------ */
+function formuleNecessaire(s) {
+  const concernes = [s.connu, s.cherche];
+  if (!concernes.includes('hypotenuse')) throw new Error('situation hors sujet : sans hypoténuse');
+  return concernes.includes('oppose') ? 'sin' : 'cos';
+}
+const fmt = n => String(n).replace('.', ',');
+const rad = d => d * Math.PI / 180;
+
+/* ------------------------------------------------------------
+   C. RENDU DU TRIANGLE (angle droit en R ; P et Q les angles aigus)
+   ------------------------------------------------------------ */
+const VB = { w: 640, h: 400 }, MARGE = 76;
+const f = n => n.toFixed(1);
+const norm = v => { const l = Math.hypot(v.x, v.y) || 1; return { x: v.x / l, y: v.y / l }; };
+const vec = (a, b) => ({ x: b.x - a.x, y: b.y - a.y });
+
+function sommets(s) {
+  const t = rad(s.theta), d1 = { x: Math.cos(t), y: Math.sin(t) }, d2 = { x: Math.sin(t), y: -Math.cos(t) };
+  const a = s.ref === 'P' ? Math.cos(rad(s.angle)) : Math.sin(rad(s.angle));
+  const b = s.ref === 'P' ? Math.sin(rad(s.angle)) : Math.cos(rad(s.angle));
+  const br = { R: { x: 0, y: 0 }, P: { x: a * d1.x, y: a * d1.y }, Q: { x: b * d2.x, y: b * d2.y } };
+  const xs = Object.values(br).map(p => p.x), ys = Object.values(br).map(p => p.y);
+  const minx = Math.min(...xs), maxx = Math.max(...xs), miny = Math.min(...ys), maxy = Math.max(...ys);
+  const k = Math.min((VB.w - 2 * MARGE) / (maxx - minx), (VB.h - 2 * MARGE) / (maxy - miny));
+  const ox = (VB.w - k * (maxx - minx)) / 2 - k * minx, oy = (VB.h - k * (maxy - miny)) / 2 - k * miny;
+  const S = {}; for (const n in br) S[n] = { x: ox + k * br[n].x, y: oy + k * br[n].y };
+  return S;
+}
+/* Rôle de chaque côté selon le sommet portant α : c'est ici, et nulle
+   part ailleurs, que se décide qui est adjacent et qui est opposé. */
+function roles(ref) {
+  const autre = ref === 'P' ? 'Q' : 'P';
+  return { hypotenuse: ['P', 'Q'], adjacent: ['R', ref], oppose: ['R', autre] };
+}
+function rendreTriangle(s, lettres) {
+  const S = sommets(s), Rl = roles(s.ref);
+  const g = { x: (S.R.x + S.P.x + S.Q.x) / 3, y: (S.R.y + S.P.y + S.Q.y) / 3 };
+  const cotes = Object.keys(Rl).map(role => {
+    const [A, B] = Rl[role].map(n => S[n]);
+    return `<line class="trait${role === s.cherche ? ' cherche' : ''}" x1="${f(A.x)}" y1="${f(A.y)}" x2="${f(B.x)}" y2="${f(B.y)}"/>`;
+  }).join('');
+  const etiquette = (role, texte, cls) => {
+    const [A, B] = Rl[role].map(n => S[n]);
+    const m = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 }, u = norm(vec(g, m));
+    return `<text class="mesure ${cls}" x="${f(m.x + 30 * u.x)}" y="${f(m.y + 30 * u.y)}">${texte}</text>`;
+  };
+  const u = norm(vec(S.R, S.P)), v = norm(vec(S.R, S.Q)), c = 20;
+  const carre = `M${f(S.R.x + c*u.x)} ${f(S.R.y + c*u.y)} L${f(S.R.x + c*u.x + c*v.x)} ${f(S.R.y + c*u.y + c*v.y)} L${f(S.R.x + c*v.x)} ${f(S.R.y + c*v.y)}`;
+  const V = S[s.ref], autre = s.ref === 'P' ? 'Q' : 'P';
+  const uu = norm(vec(V, S.R)), ww = norm(vec(V, S[autre])), r = 38;
+  const sweep = (uu.x * ww.y - uu.y * ww.x) > 0 ? 1 : 0, bis = norm({ x: uu.x + ww.x, y: uu.y + ww.y });
+  const dl = 38 + 34 + (s.angle < 35 ? 10 : 0);
+  const arc = `M${f(V.x + r*uu.x)} ${f(V.y + r*uu.y)} A${r} ${r} 0 0 ${sweep} ${f(V.x + r*ww.x)} ${f(V.y + r*ww.y)}`;
+  const lettresSvg = ['R', 'P', 'Q'].map(n => { const d = norm(vec(g, S[n])); return `<text class="sommet" x="${f(S[n].x + 32*d.x)}" y="${f(S[n].y + 32*d.y)}">${lettres[n]}</text>`; }).join('');
+  return `<svg viewBox="0 0 ${VB.w} ${VB.h}" role="img" aria-label="Triangle rectangle : angle de ${s.angle} degrés, longueur connue de ${fmt(s.valeur)} centimètres, longueur cherchée marquée d’un point d’interrogation">
+    <path class="angle-droit" d="${carre}"/>
+    <path class="arc" d="${arc}"/>
+    <text class="mesure angle" x="${f(V.x + dl*bis.x)}" y="${f(V.y + dl*bis.y)}">${s.angle}°</text>
+    ${cotes}
+    ${etiquette(s.connu, fmt(s.valeur) + ' cm', 'connue')}
+    ${etiquette(s.cherche, '?', 'inconnue')}
+    ${lettresSvg}
+  </svg>`;
+}
+
+/* ------------------------------------------------------------
+   D. DÉROULÉ
+   ------------------------------------------------------------ */
+const $ = id => document.getElementById(id);
+const ui = { prog: $('prog-texte'), barre: $('prog-barre'), sous: $('sous-consigne'), scene: $('scene'), choix: $('choix'), retour: $('retour-eleve'), suite: $('suite'), suivant: $('btn-suivant') };
+const ecrans = { intro: $('ecran-intro'), question: $('ecran-question'), fin: $('ecran-fin') };
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FRAC = (num, den) => `<span class="frac"><span class="num">${num}</span><span class="den">${den}</span></span>`;
+const message = (sorte, titre, texte) => {
+  const icone = sorte === 'juste' ? '<svg viewBox="0 0 24 24"><path d="M5 12l5 5L19 7"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M12 7v5M12 16h.01"/></svg>';
+  return `<div class="message message--${sorte}"><span class="message__icone" aria-hidden="true">${icone}</span><p>${titre ? `<b>${titre}</b>` : ''}${texte}</p></div>`;
+};
+const melanger = t => { const a = t.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+let ordre = [], index = 0, tentatives = 0;
+const bilan = { premierCoup: 0, apresAide: 0, ratesSin: 0, ratesCos: 0 };
+
+function montrer(nom) { for (const k in ecrans) ecrans[k].classList.toggle('actif', k === nom); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); }
+
+function carteFormule(fn) {
+  const haut = fn === 'sin' ? 'côté opposé' : 'côté adjacent';
+  return `<button type="button" class="choix__btn" data-choix="${fn}" aria-label="${fn === 'sin' ? 'Sinus' : 'Cosinus'} : ${haut} sur hypoténuse">
+    <span class="choix__nom">${fn === 'sin' ? 'Sinus' : 'Cosinus'}</span>
+    <span class="choix__formule"><span class="fn">${fn}(<i>angle</i>)</span> = ${FRAC(`<span class="mot">${haut}</span>`, '<span class="mot">hypoténuse</span>')}</span>
+  </button>`;
+}
+
+function afficherQuestion() {
+  const s = ordre[index]; tentatives = 0;
+  ui.prog.textContent = `Question ${index + 1} sur ${NB}`;
+  ui.barre.setAttribute('aria-valuenow', index); ui.barre.firstElementChild.style.width = `${index / NB * 100}%`;
+  ui.sous.innerHTML = `Angle de <b>${s.angle}°</b>. Longueur connue : <b>${fmt(s.valeur)} cm</b>.`;
+  ui.scene.innerHTML = rendreTriangle(s, s.lettres); ui.scene.classList.remove('sortie');
+  ui.choix.innerHTML = carteFormule('sin') + carteFormule('cos');
+  ui.retour.innerHTML = ''; ui.suite.classList.remove('visible');
+  const bonne = formuleNecessaire(s);
+  ui.choix.querySelectorAll('.choix__btn').forEach(b => b.addEventListener('click', () => repondre(b, s, bonne)));
+}
+
+function repondre(b, s, bonne) {
+  if (b.disabled) return;
+  if (b.dataset.choix === bonne) {
+    ui.choix.querySelectorAll('.choix__btn').forEach(x => { x.disabled = true; x.classList.remove('faux'); });
+    b.classList.add('juste');
+    if (tentatives === 0) bilan.premierCoup++; else bilan.apresAide++;
+    const deux = bonne === 'sin' ? 'le côté opposé et l’hypoténuse' : 'le côté adjacent et l’hypoténuse';
+    ui.retour.innerHTML = message('juste', 'Exact !', `Tu utilises ${bonne === 'sin' ? 'le sinus' : 'le cosinus'} car les deux côtés concernés sont ${deux}.`);
+    ui.suite.classList.add('visible');
+    ui.suivant.focus({ preventScroll: true });
+    if (!reduceMotion) ui.suite.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    tentatives++;
+    if (bonne === 'sin') bilan.ratesSin++; else bilan.ratesCos++;
+    b.classList.add('faux'); setTimeout(() => b.classList.remove('faux'), 900);
+    ui.retour.innerHTML = message('aide', 'Pas celle-ci.', tentatives === 1
+      ? 'Regarde uniquement le côté connu et le côté recherché. Ici, quels sont les deux côtés concernés ?'
+      : `Tu connais ${article(s.connu)} et tu cherches ${article(s.cherche)}. Quelle formule contient ces deux côtés ?`);
+  }
+}
+
+function demarrer() {
+  ordre = melanger(SITUATIONS).map(s => { const L = melanger(['A', 'B', 'C']); return Object.assign({}, s, { lettres: { R: L[0], P: L[1], Q: L[2] } }); });
+  index = 0; bilan.premierCoup = 0; bilan.apresAide = 0; bilan.ratesSin = 0; bilan.ratesCos = 0;
+  montrer('question'); afficherQuestion();
+}
+function suivante() {
+  index++;
+  if (index >= NB) { terminer(); return; }
+  ui.scene.classList.add('sortie');
+  setTimeout(afficherQuestion, reduceMotion ? 0 : 250);
+}
+
+/* ------------------------------------------------------------
+   E. BILAN
+   ------------------------------------------------------------ */
+function terminer() {
+  $('bilan-ok').textContent = `${bilan.premierCoup} / ${NB}`;
+  $('bilan-aide').textContent = String(bilan.apresAide);
+  const p = bilan.premierCoup;
+  let phrase;
+  if (p === NB) phrase = 'Sans faute : le choix de la formule est devenu un automatisme.';
+  else if (bilan.ratesSin > bilan.ratesCos) phrase = 'À revoir : le sinus relie le côté opposé et l’hypoténuse.';
+  else if (bilan.ratesCos > bilan.ratesSin) phrase = 'À revoir : le cosinus relie le côté adjacent et l’hypoténuse.';
+  else phrase = 'Le réflexe : repère le côté connu et le côté cherché, puis choisis la formule qui contient ces deux côtés.';
+  $('bilan-phrase').textContent = phrase;
+  montrer('fin');
+}
+
+$('btn-commencer').addEventListener('click', demarrer);
+$('btn-recommencer').addEventListener('click', demarrer);
+ui.suivant.addEventListener('click', suivante);
+requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.add('is-ready')));
+
+/* Contrôle interne : chaque situation concerne bien l'hypoténuse et un
+   autre côté, et la formule attendue correspond aux deux côtés concernés. */
+SITUATIONS.forEach(s => {
+  const c = [s.connu, s.cherche];
+  console.assert(c.includes('hypotenuse') && c[0] !== c[1], 'côtés concernés', s);
+  console.assert(formuleNecessaire(s) === (c.includes('oppose') ? 'sin' : 'cos'), 'formule', s);
+});
+})();
+</script>
+
+<script>
+/* =============================================================
+   RETOUR
+   Les pages de l'application sont dans le même dossier : les liens
+   « Retour » et le logo fonctionnent tels quels. On ajoute seulement
+   ceci : si l'élève vient d'une page précédente (la liste des
+   exercices), le retour le ramène exactement là, avec sa position.
+   ============================================================= */
+(function () {
+  const lien = document.querySelector('a.retour');
+  if (!lien) return;
+  lien.addEventListener('click', e => {
+    if (window.history.length <= 1) return;          // ouvert seul : lien normal
+    e.preventDefault();
+    const garde = setTimeout(() => { window.location.href = lien.href; }, 400);
+    window.addEventListener('pagehide', () => clearTimeout(garde), { once: true });
+    window.history.back();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Je m’entraîne — Trigonométrie</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval (identiques aux autres pages)
+   ============================================================= */
+:root {
+  --se-blue: #2F63F5; --se-blue-700: #244FCC; --se-blue-300: #93B4FD; --se-blue-200: #C6D4FD;
+  --se-blue-100: #E6EDFF; --se-blue-50: #F3F6FE;
+  --se-ink: #0B1526; --se-ink-2: #4A5878; --se-ink-3: #8A96B3;
+  --se-line: #DDE4F2; --se-line-2: #E9EEF8; --se-bg: #F7F9FD; --se-card: #FFFFFF;
+  --se-ok: #1B9E5A; --se-ok-100: #DFF5E8;
+  --r-card: 16px; --r-btn: 12px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --math: 'Times New Roman', Times, serif;
+  --ease: cubic-bezier(.22,.8,.22,1);
+  --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100dvh; font-family: var(--font); color: var(--se-ink); background: var(--se-bg); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(to right, rgba(47,99,245,.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+.app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; max-width: 900px; margin: 0 auto;
+  padding: calc(16px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal)); }
+@media (min-width: 760px) { .app { padding: calc(26px + var(--sat)) calc(32px + var(--sar)) calc(24px + var(--sab)) calc(32px + var(--sal)); } }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 32px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.retour { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin-top: 22px; min-height: 40px; padding: 0 4px; color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none; border-radius: 8px; transition: color .25s; }
+.retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
+.retour:hover { color: var(--se-blue); } .retour:hover svg { transform: translateX(-3px); }
+.retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+
+.hero { padding: 6px 0 20px; }
+@media (min-width: 760px) { .hero { padding: 10px 0 26px; } }
+.hero__context { margin: 0 0 8px; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+.hero h1 { margin: 0 0 8px; font-size: clamp(28px, 6.6vw, 42px); font-weight: 700; line-height: 1.05; letter-spacing: -.028em; }
+.hero__sub { margin: 0; font-size: clamp(15px, 2vw, 17px); line-height: 1.5; color: var(--se-ink-2); }
+
+/* =============================================================
+   3. LA LISTE DES EXERCICES — un seul gabarit de carte
+   ============================================================= */
+.grille { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 620px) { .grille { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
+
+.exo {
+  position: relative; display: flex; gap: 14px; align-items: stretch;
+  background: var(--se-card); border: 1px solid var(--se-line); border-radius: var(--r-card);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 6px 18px -10px rgba(11,21,38,.10);
+  text-decoration: none; color: inherit; overflow: hidden; padding: 14px;
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease), border-color .3s;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.exo:hover, .exo:focus-visible {
+  transform: translateY(-2px); border-color: var(--se-blue-200);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 14px 28px -14px rgba(47,99,245,.22);
+}
+.exo:active { transform: translateY(0) scale(.995); transition-duration: .12s; }
+.exo:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+
+.motif { position: relative; flex: 0 0 76px; width: 76px; min-height: 76px; border-radius: 12px; background: var(--se-blue-50); display: grid; place-items: center; transition: background .3s; }
+.motif svg { width: 56px; height: 56px; display: block; fill: none; stroke: var(--se-ink-2); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: transform .45s var(--ease); }
+.motif .b { stroke: var(--se-blue); } .motif .dot { fill: var(--se-blue); stroke: none; }
+.motif .lbl { font-family: var(--math); font-style: italic; font-size: 9px; fill: var(--se-blue); stroke: none; }
+.exo:hover .motif { background: var(--se-blue-100); } .exo:hover .motif svg { transform: scale(1.06); }
+
+.corps { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding: 2px 0; }
+.num { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--se-blue); }
+.exo h2 { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.2; letter-spacing: -.015em; }
+.exo p { margin: 0; font-size: 13px; line-height: 1.4; color: var(--se-ink-3); }
+.pied { margin-top: auto; padding-top: 10px; display: flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 600; color: var(--se-blue); }
+.pied svg { width: 15px; height: 15px; transition: transform .3s var(--ease); }
+.exo:hover .pied svg { transform: translateX(3px); }
+
+@media (min-width: 620px) {
+  .exo { flex-direction: column; gap: 12px; padding: 14px 14px 18px; }
+  .motif { flex: 0 0 auto; width: auto; min-height: 104px; }
+  .motif svg { width: 64px; height: 64px; }
+  .corps { padding: 0 4px; gap: 5px; }
+  .exo h2 { font-size: 18px; }
+}
+
+.note { margin: 18px 2px 0; font-size: 13px; color: var(--se-ink-3); }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 26px 2px 0; font-size: 12.5px; color: var(--se-ink-3); }
+
+.js .reveal { opacity: 0; transform: translateY(10px); }
+.js.is-ready .reveal { animation: rise .8s var(--ease) var(--d, 0ms) forwards; }
+@keyframes rise { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .reveal { opacity: 1; transform: none; }
+  .exo:hover { transform: none; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="top reveal" style="--d:0ms">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true"><rect x="0" y="10" width="5" height="8" rx="1.2" fill="#93B4FD"/><rect x="8.5" y="5" width="5" height="13" rx="1.2" fill="#6091FA"/><rect x="17" y="0" width="5" height="18" rx="1.2" fill="#2F63F5"/></svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+
+  <a class="retour reveal" style="--d:40ms" href="trigonometrie.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Retour au chapitre
+  </a>
+
+  <header class="hero">
+    <p class="hero__context reveal" style="--d:80ms">Mathématiques · Chapitre 01 · Trigonométrie</p>
+    <h1 class="reveal" style="--d:140ms">Je m’entraîne</h1>
+    <p class="hero__sub reveal" style="--d:200ms">Choisis l’exercice que tu veux travailler.</p>
+  </header>
+
+  <!-- La liste est remplie par le script à partir de EXERCICES -->
+  <main class="grille reveal" style="--d:280ms" id="grille" aria-label="Exercices du chapitre"></main>
+  <noscript><p style="color:#4A5878">Active JavaScript pour afficher les exercices.</p></noscript>
+
+  <p class="note reveal" style="--d:360ms">D’autres exercices seront ajoutés au fil du chapitre.</p>
+
+  <footer class="foot reveal" style="--d:420ms">
+    <span>Une application conçue par ton professeur.</span>
+    <span>Première Bac Pro · ERA · TEBE · TMA</span>
+  </footer>
+</div>
+
+<script>
+/* =============================================================
+   LES EXERCICES DU CHAPITRE — tout se règle ici.
+   Pour ajouter un exercice : une ligne de plus dans EXERCICES.
+   ============================================================= */
+const EXERCICES = [
+  { num: '01', titre: 'Reconnaître les côtés',      sous: 'Hypoténuse · adjacent · opposé',       href: 'entrainement-trigonometrie-01.html', motif: 'cotes' },
+  { num: '02', titre: 'Sinus ou cosinus ?',          sous: 'Choisir la bonne formule',             href: 'entrainement-trigonometrie-03.html', motif: 'formule' },
+  { num: '03', titre: 'Calculer une longueur',       sous: 'Avec le sinus ou le cosinus',          href: 'entrainement-trigonometrie-02.html',  motif: 'longueur' },
+  { num: '04', titre: 'Simplifier une fraction',     sous: '2/4 = 1/2 = 0,5',                      href: 'entrainement-fractions-equivalentes.html', motif: 'fractions' },
+  { num: '05', titre: 'Longueur sur un cercle',      sous: 'Le point M tourne sur le cercle',      href: 'entrainement-trigonometrie-05.html', motif: 'cercle' },
+];
+
+/* Motifs (viewBox 0 0 40 40) : une seule idée par icône, lisible d'un coup d'œil */
+const MOTIFS = {
+  // 01 — un triangle rectangle, un côté mis en avant, « ? » : quel côté est-ce ?
+  cotes: `
+    <path d="M6 33 L34 33 L34 9 Z" stroke="#4A5878"/>
+    <path d="M28 33 v-6 h6" stroke="#4A5878" stroke-width="1.2"/>
+    <path class="b" d="M6 33 L34 9" stroke-width="3"/>
+    <text x="14" y="17" font-family="Sora, sans-serif" font-size="13" font-weight="700" fill="#2F63F5" stroke="none">?</text>`,
+  // 02 — sin / cos, le choix
+  formule: `
+    <text x="20" y="17" text-anchor="middle" font-family="Times New Roman, serif" font-size="14" fill="#2F63F5" stroke="none">sin</text>
+    <text x="20" y="34" text-anchor="middle" font-family="Times New Roman, serif" font-size="14" fill="#4A5878" stroke="none">cos</text>
+    <text x="20" y="25.5" text-anchor="middle" font-family="Sora, sans-serif" font-size="8" font-weight="700" fill="#8A96B3" stroke="none">ou</text>`,
+  // 03 — un triangle avec un côté connu et un côté à calculer
+  longueur: `
+    <path d="M6 33 L34 33 L34 9 Z" stroke="#4A5878"/>
+    <path d="M28 33 v-6 h6" stroke="#4A5878" stroke-width="1.2"/>
+    <text x="20" y="39" text-anchor="middle" font-family="Sora, sans-serif" font-size="7.5" font-weight="600" fill="#4A5878" stroke="none">6 cm</text>
+    <text x="16" y="19" text-anchor="middle" font-family="Sora, sans-serif" font-size="12" font-weight="700" fill="#2F63F5" stroke="none">?</text>`,
+  // 04 — 2/4 = 1/2
+  fractions: `
+    <g style="font-family:'Times New Roman',serif;stroke:none">
+      <text x="9" y="16" text-anchor="middle" font-size="13" fill="#4A5878">2</text>
+      <line x1="2" y1="20" x2="16" y2="20" stroke="#4A5878" stroke-width="1.4"/>
+      <text x="9" y="33" text-anchor="middle" font-size="13" fill="#4A5878">4</text>
+      <text x="20" y="24.5" text-anchor="middle" font-size="11" fill="#8A96B3">=</text>
+      <text x="31" y="16" text-anchor="middle" font-size="13" fill="#2F63F5">1</text>
+      <line x1="24" y1="20" x2="38" y2="20" stroke="#2F63F5" stroke-width="1.4"/>
+      <text x="31" y="33" text-anchor="middle" font-size="13" fill="#2F63F5">2</text>
+    </g>`,
+  // 05 — un cercle, l'arc parcouru, le point M
+  cercle: `
+    <circle cx="20" cy="21" r="14" stroke="#4A5878"/>
+    <path class="b" d="M34 21 A14 14 0 0 0 20 7" stroke-width="3"/>
+    <line x1="20" y1="21" x2="34" y2="21" stroke="#8A96B3" stroke-width="1.2"/>
+    <circle class="dot" cx="20" cy="7" r="2.6"/>
+    <text x="24" y="6" font-family="Times New Roman, serif" font-style="italic" font-size="9" fill="#2F63F5" stroke="none">M</text>`,
+};
+const FLECHE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+
+document.getElementById('grille').innerHTML = EXERCICES.map(e => `
+  <a class="exo" href="${e.href}">
+    <span class="motif" aria-hidden="true"><svg viewBox="0 0 40 40">${MOTIFS[e.motif] || ''}</svg></span>
+    <span class="corps">
+      <span class="num">EXERCICE ${e.num}</span>
+      <h2>${e.titre}</h2>
+      <p>${e.sous}</p>
+      <span class="pied">Commencer ${FLECHE}</span>
+    </span>
+  </a>`).join('');
+
+requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.add('is-ready')));
+</script>
+</body>
+</html>

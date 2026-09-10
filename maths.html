@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Mathématiques — Ton espace de révision</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval (identiques à index.html)
+   Le vert n'apparaît QUE pour un chapitre terminé (validé).
+   ============================================================= */
+:root {
+  --se-blue:      #2F63F5;
+  --se-blue-700:  #244FCC;
+  --se-blue-300:  #93B4FD;
+  --se-blue-200:  #C6D4FD;
+  --se-blue-100:  #E6EDFF;
+  --se-blue-50:   #F3F6FE;
+  --se-ink:       #0B1526;
+  --se-ink-2:     #4A5878;
+  --se-ink-3:     #8A96B3;
+  --se-line:      #DDE4F2;
+  --se-line-2:    #E9EEF8;
+  --se-bg:        #F7F9FD;
+  --se-card:      #FFFFFF;
+  --se-ok:        #1B9E5A;
+  --se-ok-100:    #DFF5E8;
+
+  --r-card: 16px;
+  --r-btn:  10px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ease: cubic-bezier(.22,.8,.22,1);
+
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100dvh;
+  font-family: var(--font); color: var(--se-ink);
+  background: var(--se-bg); overflow-x: hidden;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(to right,  rgba(47,99,245,.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+          mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+.app {
+  position: relative; z-index: 1;
+  min-height: 100dvh; display: flex; flex-direction: column;
+  max-width: 1120px; margin: 0 auto;
+  padding: calc(16px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal));
+}
+@media (min-width: 760px) {
+  .app { padding: calc(26px + var(--sat)) calc(32px + var(--sar)) calc(24px + var(--sab)) calc(32px + var(--sal)); }
+}
+
+/* =============================================================
+   3. EN-TÊTE
+   ============================================================= */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 32px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+.retour {
+  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+  margin-top: 22px; min-height: 40px; padding: 0 4px;
+  color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none;
+  border-radius: 8px; transition: color .25s;
+}
+.retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
+.retour:hover { color: var(--se-blue); }
+.retour:hover svg { transform: translateX(-3px); }
+.retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+
+.hero { padding: 6px 0 20px; }
+@media (min-width: 760px) { .hero { padding: 10px 0 26px; } }
+.hero__context { margin: 0 0 8px; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+.hero h1 { margin: 0 0 8px; font-size: clamp(30px, 7vw, 46px); font-weight: 700; line-height: 1.05; letter-spacing: -.028em; }
+.hero__sub { margin: 0; font-size: clamp(15px, 2vw, 17px); line-height: 1.5; color: var(--se-ink-2); }
+
+/* =============================================================
+   4. LA GRILLE — un seul gabarit de carte pour les 9 chapitres
+   Mobile : la carte est une rangée (motif à gauche).
+   Tablette/ordinateur : la carte se dresse (motif au-dessus).
+   ============================================================= */
+.grille { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 560px) { .grille { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+@media (min-width: 900px) { .grille { grid-template-columns: repeat(3, 1fr); gap: 16px; } }
+
+.chap {
+  position: relative; display: flex; gap: 14px; align-items: stretch;
+  background: var(--se-card);
+  border: 1px solid var(--se-line); border-radius: var(--r-card);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 6px 18px -10px rgba(11,21,38,.10);
+  text-decoration: none; color: inherit; overflow: hidden;
+  padding: 12px;
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease), border-color .3s;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.motif {
+  position: relative; flex: 0 0 84px; width: 84px; min-height: 84px;
+  border-radius: 12px; background: var(--se-blue-50);
+  display: grid; place-items: center;
+  transition: background .3s;
+}
+.motif > svg.dessin {
+  width: 52px; height: 52px; display: block;
+  fill: none; stroke: var(--se-ink-2); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  transition: transform .45s var(--ease);
+}
+.motif .b     { stroke: var(--se-blue); }
+.motif .dot   { fill: var(--se-blue); stroke: none; }
+.motif .faint { stroke: var(--se-blue-300); }
+.corps { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding: 2px 2px 2px 0; }
+.ligne { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.num   { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--se-blue); }
+.chap h3 { margin: 0; font-size: 15.5px; font-weight: 600; line-height: 1.25; letter-spacing: -.01em; }
+.sous { font-size: 12.5px; line-height: 1.4; color: var(--se-ink-2); }
+.pied  { margin-top: auto; padding-top: 8px; display: flex; align-items: center; gap: 8px; font-size: 13px; }
+
+@media (min-width: 560px) {
+  .chap { flex-direction: column; gap: 12px; padding: 12px 12px 16px; }
+  .motif { flex: 0 0 auto; width: auto; min-height: 112px; }
+  .motif > svg.dessin { width: 60px; height: 60px; }
+  .corps { padding: 2px 6px 0; gap: 6px; }
+  .chap h3 { font-size: 16.5px; }
+  .pied { padding-top: 12px; }
+}
+
+/* ---- Étiquette d'état (haut droit du corps) ---------------- */
+.etat {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 9px; border-radius: 999px;
+  font-size: 11px; font-weight: 600; letter-spacing: .02em; white-space: nowrap;
+}
+.etat svg { width: 12px; height: 12px; }
+
+/* ---- Action en pied de carte ------------------------------ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 40px; padding: 9px 14px; border-radius: var(--r-btn);
+  background: var(--se-blue); color: #fff; font-weight: 600; font-size: 14px;
+  transition: background .25s;
+}
+.btn svg { width: 16px; height: 16px; transition: transform .35s var(--ease); }
+.mention { color: var(--se-ink-3); font-weight: 500; }
+
+/* =============================================================
+   5. ÉTATS — data-state="active" | "locked" | "completed"
+   ============================================================= */
+
+/* ACTIVE : bordure et fond un peu plus vivants, bouton, animation */
+.chap[data-state="active"] { border-color: var(--se-blue-200); background: linear-gradient(180deg, #fff 0%, var(--se-blue-50) 100%); cursor: pointer; }
+.chap[data-state="active"] .motif { background: var(--se-blue-100); }
+.chap[data-state="active"] .etat { background: var(--se-blue-100); color: var(--se-blue-700); }
+.chap[data-state="active"] .etat::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--se-blue); }
+.chap[data-state="active"]:hover, .chap[data-state="active"]:focus-visible {
+  transform: translateY(-2px); border-color: var(--se-blue-300);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 14px 28px -14px rgba(47,99,245,.25);
+}
+.chap[data-state="active"]:active { transform: translateY(0) scale(.995); transition-duration: .12s; }
+.chap[data-state="active"]:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+.chap[data-state="active"]:hover .btn { background: var(--se-blue-700); }
+.chap[data-state="active"]:hover .btn svg { transform: translateX(4px); }
+.chap[data-state="active"]:hover .motif > svg.dessin { transform: scale(1.06); }
+
+/* LOCKED : atténué mais lisible, cadenas, aucune action */
+.chap[data-state="locked"] { cursor: default; box-shadow: 0 1px 2px rgba(11,21,38,.03); }
+.chap[data-state="locked"] .motif > svg.dessin { opacity: .55; }
+.chap[data-state="locked"] .num { color: var(--se-ink-3); }
+.chap[data-state="locked"] h3 { color: var(--se-ink-2); }
+.chap[data-state="locked"] .etat { background: var(--se-bg); color: var(--se-ink-3); border: 1px solid var(--se-line-2); }
+.cadenas {
+  position: absolute; top: 8px; right: 8px; width: 26px; height: 26px;
+  border-radius: 8px; background: var(--se-card); border: 1px solid var(--se-line);
+  display: grid; place-items: center; color: var(--se-ink-3);
+}
+.cadenas svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* COMPLETED : la seule apparition du vert */
+.chap[data-state="completed"] { cursor: pointer; }
+.chap[data-state="completed"] .motif { background: var(--se-ok-100); }
+.chap[data-state="completed"] .etat { background: var(--se-ok-100); color: var(--se-ok); }
+.chap[data-state="completed"] .btn { background: var(--se-card); color: var(--se-blue); border: 1px solid var(--se-blue-200); }
+.chap[data-state="completed"]:hover { transform: translateY(-2px); border-color: var(--se-blue-200); }
+
+/* =============================================================
+   6. ANIMATION DU CHAPITRE ACTIF — le rayon pivote doucement
+   (uniquement dans une carte active)
+   ============================================================= */
+.rayon { transform-box: view-box; transform-origin: 20px 20px; }
+.chap[data-state="active"] .rayon { animation: pivot 7s cubic-bezier(.45,0,.55,1) infinite alternate; }
+@keyframes pivot { from { transform: rotate(-22deg); } to { transform: rotate(-64deg); } }
+
+/* =============================================================
+   7. PIED, ENTRÉE, MOUVEMENT RÉDUIT
+   ============================================================= */
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 26px 2px 0; font-size: 12.5px; color: var(--se-ink-3); }
+
+.js .reveal { opacity: 0; transform: translateY(10px); }
+.js.is-ready .reveal { animation: rise .8s var(--ease) var(--d, 0ms) forwards; }
+@keyframes rise { to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .reveal { opacity: 1; transform: none; }
+  .rayon { transform: rotate(-40deg); }
+  .chap:hover { transform: none; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="top reveal" style="--d:0ms">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true">
+        <rect x="0"   y="10" width="5" height="8"  rx="1.2" fill="#93B4FD"/>
+        <rect x="8.5" y="5"  width="5" height="13" rx="1.2" fill="#6091FA"/>
+        <rect x="17"  y="0"  width="5" height="18" rx="1.2" fill="#2F63F5"/>
+      </svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+
+  <a class="retour reveal" style="--d:40ms" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Retour à l’accueil
+  </a>
+
+  <header class="hero">
+    <p class="hero__context reveal" style="--d:80ms">Première Bac Pro · ERA · TEBE · TMA · Groupement B</p>
+    <h1 class="reveal" style="--d:140ms">Mathématiques</h1>
+    <p class="hero__sub reveal" style="--d:200ms">Choisis ton chapitre de révision.</p>
+  </header>
+
+  <!-- La grille est remplie par le script à partir de la liste CHAPITRES -->
+  <main class="grille reveal" style="--d:280ms" id="grille" aria-label="Chapitres de l'année"></main>
+  <noscript><p style="color:#4A5878">Active JavaScript pour afficher les chapitres.</p></noscript>
+
+  <footer class="foot reveal" style="--d:420ms">
+    <span>Une application conçue par ton professeur.</span>
+    <span>Première Bac Pro · ERA · TEBE · TMA</span>
+  </footer>
+
+</div>
+
+<script>
+/* =============================================================
+   LES CHAPITRES DE L'ANNÉE — c'est ICI qu'on fait évoluer la page.
+   state : 'active'    → accessible, bouton « Réviser ce chapitre »
+           'locked'    → cadenas, « Bientôt disponible », pas de lien
+           'completed' → coche verte, bouton « Revoir »
+   Pour ouvrir le chapitre 2 plus tard : passer son state à 'active'
+   (et, si on le souhaite, le chapitre 1 à 'completed').
+   ============================================================= */
+const CHAPITRES = [
+  { num: '01', titre: 'Trigonométrie',                        href: 'trigonometrie.html',        state: 'active', motif: 'trigo',     sous: 'Cercle trigonométrique · Radians · Sinus · Cosinus' },
+  { num: '02', titre: 'Vecteurs du plan',                     href: 'vecteurs.html',             state: 'locked', motif: 'vecteurs'   },
+  { num: '03', titre: 'Géométrie dans l’espace',              href: 'geometrie-espace.html',     state: 'locked', motif: 'espace'     },
+  { num: '04', titre: 'Suites numériques',                    href: 'suites.html',               state: 'locked', motif: 'suites'     },
+  { num: '05', titre: 'Équations et inéquations graphiques',  href: 'equations-graphiques.html', state: 'locked', motif: 'equations'  },
+  { num: '06', titre: 'Fonctions du second degré',            href: 'second-degre.html',         state: 'locked', motif: 'parabole'   },
+  { num: '07', titre: 'Dérivation et variations',             href: 'derivation.html',           state: 'locked', motif: 'derivee'    },
+  { num: '08', titre: 'Statistiques à deux variables',        href: 'statistiques.html',         state: 'locked', motif: 'stats'      },
+  { num: '09', titre: 'Probabilités',                         href: 'probabilites.html',         state: 'locked', motif: 'probas'     },
+];
+
+/* Motifs (viewBox 0 0 40 40), un par thème — sobres et scolaires */
+const MOTIFS = {
+  trigo: `
+    <line class="faint" x1="4" y1="20" x2="36" y2="20"/><line class="faint" x1="20" y1="36" x2="20" y2="4"/>
+    <circle cx="20" cy="20" r="13"/>
+    <path class="faint" d="M27 20 A7 7 0 0 0 25 14.6"/>
+    <g class="rayon"><line class="b" x1="20" y1="20" x2="33" y2="20"/><circle class="dot" cx="33" cy="20" r="2.2"/></g>`,
+  vecteurs: `
+    <line class="faint" x1="6" y1="32" x2="34" y2="32"/><line class="faint" x1="6" y1="32" x2="6" y2="6"/>
+    <path class="b" d="M9 29 L30 11"/><path class="b" d="M24 11 h6 v6"/>`,
+  espace: `
+    <path d="M8 14 L20 8 L32 14 L32 28 L20 34 L8 28 Z"/>
+    <path class="b" d="M8 14 L20 20 L32 14 M20 20 V34"/>
+    <path class="faint" d="M8 28 L20 22 L32 28"/>`,
+  suites: `
+    <line class="faint" x1="6" y1="32" x2="34" y2="32"/>
+    <path class="faint" d="M9 28 L16 24 L23 18 L30 9" stroke-dasharray="2 3"/>
+    <circle class="dot" cx="9" cy="28" r="2.2"/><circle class="dot" cx="16" cy="24" r="2.2"/>
+    <circle class="dot" cx="23" cy="18" r="2.2"/><circle class="dot" cx="30" cy="9" r="2.2"/>`,
+  equations: `
+    <line class="faint" x1="6" y1="32" x2="34" y2="32"/><line class="faint" x1="8" y1="34" x2="8" y2="6"/>
+    <path d="M8 26 L32 12"/><path class="b" d="M8 10 C 16 10, 20 30, 32 30"/>
+    <circle class="dot" cx="18.6" cy="19.9" r="2.4"/>`,
+  parabole: `
+    <line class="faint" x1="6" y1="30" x2="34" y2="30"/><line class="faint" x1="20" y1="34" x2="20" y2="6"/>
+    <path class="b" d="M7 9 C 12 34, 28 34, 33 9"/>
+    <circle class="dot" cx="20" cy="27.7" r="2.2"/>`,
+  derivee: `
+    <line class="faint" x1="6" y1="32" x2="34" y2="32"/>
+    <path d="M7 28 C 14 8, 22 8, 33 26"/>
+    <path class="b" d="M8 21 L30 8"/>
+    <circle class="dot" cx="16.3" cy="16" r="2.2"/>`,
+  stats: `
+    <line class="faint" x1="6" y1="32" x2="34" y2="32"/><line class="faint" x1="8" y1="34" x2="8" y2="6"/>
+    <path class="b" d="M9 29 L32 11"/>
+    <circle class="dot" cx="12" cy="24" r="2"/><circle class="dot" cx="17" cy="25" r="2"/><circle class="dot" cx="20" cy="18" r="2"/>
+    <circle class="dot" cx="25" cy="19" r="2"/><circle class="dot" cx="28" cy="12" r="2"/><circle class="dot" cx="31" cy="16" r="2"/>`,
+  probas: `
+    <path d="M8 20 L18 11 M8 20 L18 29"/>
+    <path class="b" d="M18 11 L30 7 M18 11 L30 16"/>
+    <path class="faint" d="M18 29 L30 25 M18 29 L30 34"/>
+    <circle class="dot" cx="8" cy="20" r="2.2"/><circle class="dot" cx="18" cy="11" r="2"/><circle class="dot" cx="18" cy="29" r="2"/>`,
+};
+
+const ICONE = {
+  fleche:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`,
+  cadenas: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`,
+  coche:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>`,
+};
+
+/* Textes par état : étiquette et pied de carte */
+const ETATS = {
+  active:    { etiquette: 'Disponible',         pied: c => `<span class="btn">Réviser ce chapitre ${ICONE.fleche}</span>` },
+  locked:    { etiquette: 'Verrouillé',         pied: c => `<span class="mention">Bientôt disponible</span>` },
+  completed: { etiquette: 'Terminé',            pied: c => `<span class="btn">Revoir ${ICONE.fleche}</span>` },
+};
+
+function carte(c) {
+  const e = ETATS[c.state] || ETATS.locked;
+  const cliquable = c.state !== 'locked';
+  const balise = cliquable ? 'a' : 'div';
+  const attrs = cliquable ? `href="${c.href}"` : `aria-disabled="true"`;
+  const etiquetteIcone = c.state === 'completed' ? ICONE.coche : '';
+  return `
+  <${balise} class="chap" data-state="${c.state}" ${attrs}>
+    <span class="motif" aria-hidden="true">
+      <svg class="dessin" viewBox="0 0 40 40">${MOTIFS[c.motif] || ''}</svg>
+      ${c.state === 'locked' ? `<span class="cadenas">${ICONE.cadenas}</span>` : ''}
+    </span>
+    <span class="corps">
+      <span class="ligne">
+        <span class="num">CHAPITRE ${c.num}</span>
+        <span class="etat">${etiquetteIcone}${e.etiquette}</span>
+      </span>
+      <h3>${c.titre}</h3>
+      ${c.sous ? `<span class="sous">${c.sous}</span>` : ''}
+      <span class="pied">${e.pied(c)}</span>
+    </span>
+  </${balise}>`;
+}
+
+document.getElementById('grille').innerHTML = CHAPITRES.map(carte).join('');
+
+/* Entrée orchestrée, après le premier rendu */
+requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.add('is-ready')));
+</script>
+</body>
+</html>
