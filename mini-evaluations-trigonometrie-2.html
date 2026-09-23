@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Mini-évaluations — Trigonométrie</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval
+   Le vert reste réservé à une compétence validée : il n'apparaît
+   ici que pour l'état « reussi », pas pour le mini-test à préparer.
+   ============================================================= */
+:root {
+  --se-blue: #2F63F5; --se-blue-700: #244FCC; --se-blue-300: #93B4FD; --se-blue-200: #C6D4FD;
+  --se-blue-100: #E6EDFF; --se-blue-50: #F3F6FE;
+  --se-ink: #0B1526; --se-ink-2: #4A5878; --se-ink-3: #8A96B3;
+  --se-line: #DDE4F2; --se-line-2: #E9EEF8; --se-bg: #F7F9FD; --se-card: #FFFFFF;
+  --se-ok: #1B9E5A; --se-ok-100: #DFF5E8;
+  --r-card: 16px; --r-btn: 12px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --math: 'Times New Roman', Times, serif;
+  --ease: cubic-bezier(.22,.8,.22,1);
+  --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100dvh; font-family: var(--font); color: var(--se-ink); background: var(--se-bg); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(to right, rgba(47,99,245,.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+button, a { touch-action: manipulation; }
+.app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; max-width: 900px; margin: 0 auto;
+  padding: calc(16px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal)); }
+@media (min-width: 760px) { .app { padding: calc(26px + var(--sat)) calc(32px + var(--sar)) calc(24px + var(--sab)) calc(32px + var(--sal)); } }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 2px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.retour { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; margin: 16px 0 0 -6px; min-height: 48px; padding: 4px 10px 4px 6px; color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none; border-radius: 8px; transition: color .25s; }
+.retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
+.retour:hover { color: var(--se-blue); } .retour:hover svg { transform: translateX(-3px); }
+.retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+
+.hero { padding: 4px 0 18px; }
+@media (min-width: 760px) { .hero { padding: 8px 0 24px; } }
+.hero__context { margin: 0 0 8px; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+.hero h1 { margin: 0 0 8px; font-size: clamp(27px, 6.4vw, 40px); font-weight: 700; line-height: 1.06; letter-spacing: -.028em; }
+.hero__sub { margin: 0; max-width: 46ch; font-size: clamp(15px, 2vw, 17px); line-height: 1.5; color: var(--se-ink-2); }
+
+/* Rappel de la différence avec « Je m'entraîne » */
+.note-role { display: flex; gap: 12px; align-items: flex-start; margin: 4px 0 22px; padding: 13px 15px; border-radius: 12px; background: var(--se-blue-50); border: 1px solid var(--se-blue-200); }
+.note-role p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--se-ink-2); }
+.note-role b { color: var(--se-ink); font-weight: 600; }
+
+/* =============================================================
+   3. LES CARTES DE MINI-ÉVALUATION — un seul gabarit, trois états
+   ============================================================= */
+.liste { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 680px) { .liste { grid-template-columns: 1fr 1fr; gap: 16px; } }
+.groupe__titre { display: flex; align-items: baseline; justify-content: space-between; margin: 26px 2px 12px; }
+.groupe__titre h2 { margin: 0; font-size: 15px; font-weight: 600; color: var(--se-ink-2); }
+.groupe__titre span { font-size: 12.5px; color: var(--se-ink-3); }
+
+.mt {
+  position: relative; display: flex; flex-direction: column; gap: 6px;
+  background: var(--se-card); border: 1px solid var(--se-line); border-radius: var(--r-card);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 6px 18px -10px rgba(11,21,38,.10);
+  padding: 16px 16px 18px; text-decoration: none; color: inherit;
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease), border-color .3s;
+  -webkit-tap-highlight-color: transparent;
+}
+.mt__num { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--se-blue); }
+.mt h3 { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.25; letter-spacing: -.015em; }
+.mt__comp { margin: 2px 0 0; font-size: 13.5px; line-height: 1.45; color: var(--se-ink-2); }
+.mt__comp b { display: block; font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--se-ink-3); margin-bottom: 2px; }
+.mt__pied { margin-top: auto; padding-top: 14px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  min-height: 46px; padding: 11px 18px; border-radius: var(--r-btn);
+  background: var(--se-blue); color: #fff; font: inherit; font-weight: 600; font-size: 15px;
+  transition: background .25s;
+}
+.btn svg { width: 16px; height: 16px; transition: transform .35s var(--ease); }
+.mt:hover .btn { background: var(--se-blue-700); } .mt:hover .btn svg { transform: translateX(3px); }
+.btn--clair { background: var(--se-card); color: var(--se-blue); border: 1px solid var(--se-blue-200); }
+.mt:hover .btn--clair { background: var(--se-blue-50); }
+.mention { display: inline-flex; align-items: center; gap: 7px; min-height: 46px; font-size: 13.5px; font-weight: 500; color: var(--se-ink-3); }
+
+/* --- état : à préparer (mise en avant, en bleu — jamais en vert) --- */
+.mt[data-statut="current"] { border-color: var(--se-blue-200); background: linear-gradient(180deg, #fff 0%, var(--se-blue-50) 100%); box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 10px 26px -14px rgba(47,99,245,.22); }
+.mt[data-statut="current"]:hover, .mt[data-statut="available"]:hover, .mt[data-statut="reussi"]:hover { transform: translateY(-2px); border-color: var(--se-blue-300); }
+.mt[data-statut="current"]:focus-visible, .mt[data-statut="available"]:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+.etat {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 600; letter-spacing: .02em;
+  background: var(--se-blue-100); color: var(--se-blue-700);
+}
+.etat::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--se-blue); }
+.etat svg { width: 12px; height: 12px; }
+
+/* --- état : verrouillé (lisible, pas triste) --- */
+.mt[data-statut="locked"] { cursor: default; box-shadow: 0 1px 2px rgba(11,21,38,.03); }
+.mt[data-statut="locked"] .mt__num { color: var(--se-ink-3); }
+.mt[data-statut="locked"] h3 { color: var(--se-ink-2); }
+.mt[data-statut="locked"] .etat { background: var(--se-bg); color: var(--se-ink-3); border: 1px solid var(--se-line-2); }
+.mt[data-statut="locked"] .etat::before { display: none; }
+.cadenas { position: absolute; top: 14px; right: 14px; width: 28px; height: 28px; border-radius: 8px; background: var(--se-card); border: 1px solid var(--se-line); display: grid; place-items: center; color: var(--se-ink-3); }
+.cadenas svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* --- état : réussi (le seul vert de la page) --- */
+.mt[data-statut="reussi"] .etat { background: var(--se-ok-100); color: var(--se-ok); }
+.mt[data-statut="reussi"] .etat::before { display: none; }
+
+@media (max-width: 520px) {
+  .mt__pied .btn, .mt__pied .mention { width: 100%; min-height: 50px; }
+  .mt__pied .mention { justify-content: center; }
+}
+
+.note { margin: 20px 2px 0; font-size: 13px; color: var(--se-ink-3); }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 26px 2px 0; font-size: 12.5px; color: var(--se-ink-3); }
+.js .reveal { opacity: 0; transform: translateY(10px); }
+.js.is-ready .reveal { animation: rise .8s var(--ease) var(--d, 0ms) forwards; }
+@keyframes rise { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .reveal { opacity: 1; transform: none; }
+  .mt:hover { transform: none; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="top reveal" style="--d:0ms">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true"><rect x="0" y="10" width="5" height="8" rx="1.2" fill="#93B4FD"/><rect x="8.5" y="5" width="5" height="13" rx="1.2" fill="#6091FA"/><rect x="17" y="0" width="5" height="18" rx="1.2" fill="#2F63F5"/></svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+
+  <a class="retour reveal" style="--d:40ms" href="entrainement-trigonometrie.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Retour à l’entraînement
+  </a>
+
+  <header class="hero">
+    <p class="hero__context reveal" style="--d:80ms">Mathématiques · Trigonométrie</p>
+    <h1 class="reveal" style="--d:140ms">Mini-évaluations</h1>
+    <p class="hero__sub reveal" style="--d:200ms">Entraîne-toi sur la compétence évaluée à la prochaine mini-évaluation.</p>
+  </header>
+
+  <div class="note-role reveal" style="--d:240ms">
+    <p>Ici, tu travailles <b>ce qui sera évalué à la prochaine mini-évaluation</b>. Les questions ne seront pas exactement les mêmes qu’en classe, mais la méthode, si.</p>
+  </div>
+
+  <!-- Les cartes sont générées à partir de la liste MINI_TESTS du script -->
+  <main id="contenu" aria-label="Mini-évaluations du chapitre"></main>
+  <noscript><p style="color:#4A5878">Active JavaScript pour afficher les mini-évaluations.</p></noscript>
+
+  <p class="note reveal" style="--d:420ms">D’autres mini-évaluations s’ajouteront au fil du chapitre.</p>
+
+  <footer class="foot reveal" style="--d:480ms">
+    <span>Une application conçue par ton professeur.</span>
+    <span>Première Bac Pro · ERA · TEBE · TMA</span>
+  </footer>
+</div>
+
+<script>
+/* =============================================================
+   LES MINI-TESTS DU CHAPITRE — tout se règle ici.
+   statut : 'current'   → à préparer pour la prochaine séance (en avant)
+            'available' → entraînement d'un mini-test déjà passé, toujours ouvert
+            'locked'    → pas encore ouvert (cadenas, pas de lien)
+            'reussi'    → facultatif : compétence validée (seul emploi du vert)
+   Pour passer au mini-test suivant : mettre l'actuel en 'available'
+   et le suivant en 'current'. Rien d'autre à toucher.
+   ============================================================= */
+const MINI_TESTS = [
+  {
+    numero: 1,
+    titre: 'Repérer les côtés d’un triangle rectangle',
+    competence: 'Reconnaître l’hypoténuse, le côté adjacent et le côté opposé.',
+    statut: 'available',
+    lien: 'entrainement-trigonometrie-01.html',
+  },
+  {
+    numero: 2,
+    titre: 'Choisir sinus ou cosinus',
+    competence: 'Choisir la bonne relation en fonction des côtés connus et recherchés.',
+    statut: 'current',
+    lien: 'entrainement-trigonometrie-03.html',
+  },
+  {
+    numero: 3,
+    titre: 'Utiliser sinus et cosinus',
+    competence: 'Compléter la relation et rédiger le calcul.',
+    statut: 'locked',
+    lien: 'entrainement-trigonometrie-02.html',
+  },
+  {
+    numero: 4,
+    titre: 'Écriture décimale',
+    competence: 'Écrire une fraction ou un pourcentage en écriture décimale.',
+    statut: 'current',
+    lien: 'entrainement-ecriture-decimale.html',
+  },
+  {
+    numero: 5,
+    titre: 'Longueur parcourue sur un cercle',
+    competence: 'Passer de l’angle à la fraction du tour puis calculer la longueur parcourue.',
+    statut: 'locked',
+    lien: 'entrainement-trigonometrie-05.html',
+  },
+];
+
+const ICONE = {
+  fleche: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`,
+  cadenas: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`,
+  coche: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>`,
+};
+/* Ce que chaque état affiche : étiquette, action, et s'il est cliquable */
+const ETATS = {
+  current:   { etiquette: 'À préparer pour la prochaine séance', action: c => `<span class="btn">M’entraîner ${ICONE.fleche}</span>`, cliquable: true },
+  available: { etiquette: 'Toujours accessible',                 action: c => `<span class="btn btn--clair">M’entraîner ${ICONE.fleche}</span>`, cliquable: true },
+  locked:    { etiquette: 'Bientôt disponible',                  action: c => `<span class="mention">Pas encore ouvert</span>`, cliquable: false },
+  reussi:    { etiquette: `${ICONE.coche} Réussi`,               action: c => `<span class="btn btn--clair">Revoir ${ICONE.fleche}</span>`, cliquable: true },
+};
+
+function carte(m, delai) {
+  const e = ETATS[m.statut] || ETATS.locked;
+  const balise = e.cliquable ? 'a' : 'div';
+  const attrs = e.cliquable ? `href="${m.lien}"` : 'aria-disabled="true"';
+  return `<${balise} class="mt reveal" style="--d:${delai}ms" data-statut="${m.statut}" ${attrs}>
+    ${m.statut === 'locked' ? `<span class="cadenas">${ICONE.cadenas}</span>` : ''}
+    <span class="etat">${e.etiquette}</span>
+    <span class="mt__num">MINI-ÉVALUATION ${m.numero}</span>
+    <h3>${m.titre}</h3>
+    <p class="mt__comp"><b>Compétence</b>${m.competence}</p>
+    <span class="mt__pied">${e.action(m)}</span>
+  </${balise}>`;
+}
+
+/* Ordre d'affichage : d'abord celui à préparer, puis les précédents, puis les suivants */
+const groupes = [
+  { cle: 'current',   titre: 'À préparer maintenant' },
+  { cle: 'available', titre: 'Mini-évaluations déjà passées', note: 'toujours accessibles' },
+  { cle: 'reussi',    titre: 'Compétences validées' },
+  { cle: 'locked',    titre: 'La suite du chapitre' },
+];
+let html = '', n = 0;
+const pas = i => Math.min(280 + i * 60, 620);          // apparition échelonnée, mais jamais lente
+for (const g of groupes) {
+  const items = MINI_TESTS.filter(m => m.statut === g.cle);
+  if (!items.length) continue;
+  html += `<section class="reveal" style="--d:${pas(n)}ms"><div class="groupe__titre"><h2>${g.titre}</h2>${g.note ? `<span>${g.note}</span>` : `<span>${items.length} mini-évaluation${items.length > 1 ? 's' : ''}</span>`}</div>
+    <div class="liste">${items.map(m => carte(m, pas(++n))).join('')}</div></section>`;
+  n++;
+}
+document.getElementById('contenu').innerHTML = html;
+
+requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.add('is-ready')));
+
+/* Retour : si l'élève vient de la page du chapitre, on y revient exactement */
+(function () {
+  const lien = document.querySelector('a.retour');
+  if (!lien) return;
+  lien.addEventListener('click', e => {
+    if (window.history.length <= 1) return;
+    e.preventDefault();
+    const garde = setTimeout(() => { window.location.href = lien.href; }, 400);
+    window.addEventListener('pagehide', () => clearTimeout(garde), { once: true });
+    window.history.back();
+  });
+})();
+</script>
+</body>
+</html>
