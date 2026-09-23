@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Retrouver le pourcentage — à partir d’une fraction ou d’un décimal</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval
+   ============================================================= */
+:root {
+  --se-blue: #2F63F5; --se-blue-700: #244FCC; --se-blue-300: #93B4FD; --se-blue-200: #C6D4FD;
+  --se-blue-100: #E6EDFF; --se-blue-50: #F3F6FE;
+  --se-ink: #0B1526; --se-ink-2: #4A5878; --se-ink-3: #8A96B3;
+  --se-line: #DDE4F2; --se-line-2: #E9EEF8; --se-bg: #F7F9FD; --se-card: #FFFFFF;
+  --se-ok: #1B9E5A; --se-ok-700: #157A46; --se-ok-100: #DFF5E8;
+  --se-err: #D9534F; --se-err-100: #FDECEC;
+  --r-card: 18px; --r-btn: 12px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --math: 'Times New Roman', Times, serif;
+  --ease: cubic-bezier(.22,.8,.22,1);
+  --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE ET COQUILLE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100dvh; font-family: var(--font); color: var(--se-ink); background: var(--se-bg); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(to right, rgba(47,99,245,.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+button, a, input { touch-action: manipulation; }
+.app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; max-width: 720px; margin: 0 auto;
+  padding: calc(16px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal)); }
+@media (min-width: 760px) { .app { padding: calc(26px + var(--sat)) calc(32px + var(--sar)) calc(24px + var(--sab)) calc(32px + var(--sal)); } }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 2px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.retour { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; margin: 14px 0 0 -6px; min-height: 48px; padding: 4px 10px 4px 6px; color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none; border-radius: 8px; transition: color .25s; }
+.retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
+.retour:hover { color: var(--se-blue); } .retour:hover svg { transform: translateX(-3px); }
+.retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+.contexte { margin: 10px 0 0; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+
+.cadre { margin-top: 12px; background: var(--se-card); border: 1px solid var(--se-line); border-radius: var(--r-card); box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 8px 22px -14px rgba(11,21,38,.12); padding: 20px 18px 22px; }
+@media (min-width: 560px) { .cadre { padding: 26px 28px 28px; } }
+.ecran { display: none; } .ecran.actif { display: block; animation: rise .45s var(--ease); }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+h1, h2 { margin: 0; letter-spacing: -.02em; line-height: 1.15; }
+h1 { font-size: clamp(22px, 5.4vw, 30px); font-weight: 700; } h2 { font-size: clamp(21px, 5vw, 27px); font-weight: 700; }
+.texte { margin: 0; font-size: 15.5px; line-height: 1.55; color: var(--se-ink-2); } .texte b { color: var(--se-ink); font-weight: 600; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 12px 20px; border: 0; border-radius: var(--r-btn); background: var(--se-blue); color: #fff; font: inherit; font-weight: 600; font-size: 15.5px; cursor: pointer; text-decoration: none; transition: background .25s, transform .3s var(--ease); -webkit-tap-highlight-color: transparent; }
+.btn svg { width: 17px; height: 17px; } .btn:hover { background: var(--se-blue-700); } .btn:active { transform: scale(.985); }
+.btn:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+.btn--secondaire { background: var(--se-card); color: var(--se-blue); border: 1px solid var(--se-blue-200); } .btn--secondaire:hover { background: var(--se-blue-50); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; } @media (max-width: 520px) { .actions .btn { flex: 1 1 100%; min-height: 52px; } }
+.rappel { display: flex; gap: 12px; align-items: flex-start; margin-top: 16px; padding: 14px 16px; border-radius: 12px; background: var(--se-blue-50); border: 1px solid var(--se-blue-200); }
+.rappel p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--se-ink-2); } .rappel b { color: var(--se-ink); font-weight: 600; }
+
+.progression { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+.progression__ligne { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: var(--se-ink-2); gap: 10px; }
+.progression__ligne span { white-space: nowrap; } .progression__ligne span:last-child { color: var(--se-ink-3); font-weight: 500; }
+.barre { height: 6px; border-radius: 999px; background: var(--se-blue-100); overflow: hidden; } .barre > span { display: block; height: 100%; width: 0; border-radius: 999px; background: var(--se-blue); transition: width .5s var(--ease); }
+
+.message { display: flex; gap: 12px; align-items: flex-start; padding: 13px 15px; border-radius: 12px; border: 1px solid transparent; animation: rise .35s var(--ease); }
+.message__icone { flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; }
+.message__icone svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.message p { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--se-ink-2); } .message p b { display: block; margin-bottom: 2px; font-size: 15px; }
+.message--juste { background: var(--se-ok-100); border-color: #BFE8D0; } .message--juste .message__icone { background: var(--se-ok); color: #fff; } .message--juste p b { color: var(--se-ok-700); }
+.message--aide { background: var(--se-blue-50); border-color: var(--se-blue-200); } .message--aide .message__icone { background: var(--se-blue-100); color: var(--se-blue-700); } .message--aide p b { color: var(--se-blue-700); }
+.message .frac { font-family: var(--math); font-size: 19px; vertical-align: middle; margin: 0 2px; }
+.message .frac > .num { padding: 0 4px 1px; border-bottom-width: 1.6px; min-width: 0; } .message .frac > .den { padding: 1px 4px 0; min-width: 0; }
+
+/* =============================================================
+   2 bis. LES DEUX ÉTAPES DE L'INTRODUCTION
+   ============================================================= */
+.etapes-intro { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
+.pas--pct { margin-top: 12px; background: var(--se-card); }
+@media (min-width: 640px) { .etapes-intro { grid-template-columns: 1fr 1fr; } }
+.pas { padding: 14px 12px 12px; border-radius: 14px; background: var(--se-blue-50); border: 1px solid var(--se-blue-200); }
+.pas__titre { display: flex; align-items: center; gap: 9px; margin: 0 0 4px; font-size: 14.5px; font-weight: 600; color: var(--se-ink); }
+.pas__num { flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--se-blue); color: #fff; font-size: 12px; font-weight: 700; }
+.pas__math { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; padding: 12px 2px 8px; font-family: var(--math); font-size: 30px; color: var(--se-ink); }
+.pas__note { margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--se-ink-2); text-align: center; }
+.pas__note b { color: var(--se-ink); font-weight: 600; }
+.ops { display: inline-flex; flex-direction: column; align-items: center; gap: 1px; }
+.ops__x { font-family: var(--font); font-size: 11.5px; font-weight: 600; color: var(--se-blue-700); }
+.ops__eg { font-size: 30px; color: var(--se-ink-3); line-height: 1.1; padding: 1px 0; }
+.eg { color: var(--se-ink-3); }
+.virgule { position: relative; }
+.virgule__ch { color: var(--se-blue-700); }
+.frac--mini { font-family: var(--math); font-size: 19px; vertical-align: middle; margin: 0 3px; }
+.frac--mini > .num { padding: 0 4px 1px; border-bottom-width: 1.6px; min-width: 0; }
+.frac--mini > .den { padding: 1px 4px 0; min-width: 0; }
+
+/* --- Le zéro barré : le geste du tableau --- */
+.zbarre { color: var(--se-ink-3); text-decoration: line-through; text-decoration-color: var(--se-blue); text-decoration-thickness: 2.5px; }
+
+/* --- La réponse : un nombre, suivi du symbole % --- */
+.reponse .pct { align-items: center; gap: 10px; }
+.reponse .pct .sym { font-size: 26px; }
+
+/* --- La réponse : une fraction à écrire, deux cases --- */
+.frac.saisie > .num { border-bottom: 3px solid var(--se-ink); padding-bottom: 8px; }
+.frac.saisie > .den { padding-top: 8px; }
+.frac.saisie .champ { width: 108px; min-height: 58px; font-size: 30px; }
+.etiq { display: block; margin-top: 4px; font-family: var(--font); font-size: 11.5px; font-weight: 600; color: var(--se-ink-3); text-align: center; }
+@media (max-width: 360px) { .frac.saisie .champ { width: 92px; } }
+
+/* =============================================================
+   3. LA QUESTION
+   ============================================================= */
+.consigne { margin: 0 0 4px; font-size: clamp(16px, 4.2vw, 19px); font-weight: 600; line-height: 1.35; }
+.donnee {
+  display: flex; align-items: center; justify-content: center;
+  margin: 10px 0 18px; padding: 20px 12px; border-radius: 14px;
+  background: var(--se-blue-50); border: 1px solid var(--se-blue-200);
+  font-family: var(--math); font-size: 50px; color: var(--se-ink);
+}
+@media (max-width: 520px) {
+  .donnee { font-size: 42px; padding: 16px 10px; }
+  .pas__math { font-size: 26px; gap: 8px; }
+  .reponse { font-size: 30px; gap: 10px; }
+  .champ { width: 124px; min-height: 60px; font-size: 30px; }
+  h1 { font-size: 24px; }
+}
+@media (max-width: 360px) {
+  .donnee { font-size: 36px; }
+  .pas__math { font-size: 23px; }
+  .champ { width: 112px; }
+}
+.frac { display: inline-flex; flex-direction: column; align-items: center; }
+.frac > .num { border-bottom: 3px solid currentColor; padding: 0 10px 6px; min-width: 44px; text-align: center; }
+.frac > .den { padding: 6px 10px 0; min-width: 44px; text-align: center; }
+.pct { display: inline-flex; align-items: baseline; gap: 7px; }
+.pct .sym { font-family: var(--font); font-size: .5em; font-weight: 600; color: var(--se-ink-2); }
+.reponse { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; font-family: var(--math); font-size: 34px; }
+.champ {
+  width: 132px; min-height: 58px; padding: 6px 10px; text-align: center;
+  border-radius: 10px; border: 2px solid var(--se-blue-300); background: var(--se-card);
+  font-family: var(--math); font-size: 32px; color: var(--se-ink);
+  -webkit-appearance: none; appearance: none;
+}
+.champ:focus { outline: none; border-color: var(--se-blue); box-shadow: 0 0 0 4px var(--se-blue-100); }
+.champ.fausse { border-color: var(--se-err); background: var(--se-err-100); }
+.champ.bonne { border-color: var(--se-ok); background: var(--se-ok-100); }
+.pied-etape { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+@media (max-width: 520px) { .pied-etape { flex-direction: column; align-items: stretch; } .pied-etape .btn { width: 100%; min-height: 52px; } }
+.retour-eleve { margin-top: 14px; }
+
+/* Le chemin : fraction → sur 100 → décimal, affiché après la réussite */
+.chemin { margin-top: 14px; padding: 14px 10px; border-radius: 14px; background: var(--se-ok-100); border: 1px solid #BFE8D0; animation: rise .5s var(--ease); }
+.chemin .ligne-math { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 12px; padding: 4px 2px 8px; font-family: var(--math); font-size: 30px; color: var(--se-ok-700); }
+.chemin .ligne-math .op { font-size: .55em; font-family: var(--font); font-weight: 600; color: var(--se-ok-700); }
+.chemin .apparait { opacity: 0; animation: entrer .6s var(--ease) var(--d, 0s) forwards; }
+@keyframes entrer { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+.chemin p { margin: 2px 0 0; text-align: center; font-size: 13.5px; color: var(--se-ok-700); }
+.suite { margin-top: 16px; display: none; } .suite.visible { display: flex; }
+
+/* Bilan */
+.bilan { display: grid; grid-template-columns: 1fr; gap: 10px; } @media (min-width: 480px) { .bilan { grid-template-columns: 1fr 1fr; } }
+.bilan__carte { padding: 16px 18px; border-radius: 12px; border: 1px solid var(--se-line); background: var(--se-bg); }
+.bilan__carte--ok { background: var(--se-ok-100); border-color: #BFE8D0; }
+.bilan__nombre { display: block; font-size: 32px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+.bilan__carte--ok .bilan__nombre { color: var(--se-ok-700); } .bilan__carte--aide .bilan__nombre { color: var(--se-blue-700); }
+.bilan__libelle { display: block; margin-top: 6px; font-size: 13.5px; color: var(--se-ink-2); line-height: 1.4; }
+.methode { margin-top: 16px; padding: 16px; border-radius: 14px; background: var(--se-blue-50); border: 1px solid var(--se-blue-200); }
+.methode h3 { margin: 0 0 8px; font-size: 12.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--se-blue-700); }
+.methode ol { margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.65; color: var(--se-ink-2); }
+.methode ol b { color: var(--se-ink); font-weight: 600; }
+
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 22px 2px 0; font-size: 12.5px; color: var(--se-ink-3); }
+.js .reveal { opacity: 0; transform: translateY(10px); } .js.is-ready .reveal { animation: rise .8s var(--ease) var(--d, 0ms) forwards; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .reveal { opacity: 1; transform: none; } .chemin .apparait { opacity: 1; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <div class="top reveal" style="--d:0ms">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true"><rect x="0" y="10" width="5" height="8" rx="1.2" fill="#93B4FD"/><rect x="8.5" y="5" width="5" height="13" rx="1.2" fill="#6091FA"/><rect x="17" y="0" width="5" height="18" rx="1.2" fill="#2F63F5"/></svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+  <a class="retour reveal" style="--d:40ms" href="mini-evaluations-trigonometrie.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Retour
+  </a>
+  <p class="contexte reveal" style="--d:80ms">Mathématiques · Écritures équivalentes</p>
+
+  <main class="cadre reveal" style="--d:140ms">
+
+    <!-- ===================== INTRODUCTION ===================== -->
+    <section class="ecran actif" id="ecran-intro" aria-labelledby="titre-intro">
+      <h1 id="titre-intro">Retrouver le pourcentage</h1>
+      <p class="texte" style="margin-top:8px">Un pourcentage, c’est un nombre <b>sur 100</b>. Deux départs possibles.</p>
+
+      <div class="etapes-intro">
+        <div class="pas">
+          <p class="pas__titre"><span class="pas__num">1</span>Je pars d’une fraction</p>
+          <div class="pas__math">
+            <span class="frac"><span class="num">3</span><span class="den">5</span></span>
+            <span class="ops"><span class="ops__x">× 20</span><span class="ops__eg">=</span><span class="ops__x">× 20</span></span>
+            <span class="frac"><span class="num">60</span><span class="den">100</span></span>
+            <span class="eg">=</span>
+            <span class="pct">60<span class="sym">%</span></span>
+          </div>
+          <p class="pas__note">Je mets sur 100, et le nombre du haut est le pourcentage.</p>
+        </div>
+
+        <div class="pas">
+          <p class="pas__titre"><span class="pas__num">2</span>Je pars d’un décimal</p>
+          <div class="pas__math">
+            <span>0,35</span>
+            <span class="ops"><span class="ops__x">× 100</span><span class="ops__eg">=</span></span>
+            <span class="pct">35<span class="sym">%</span></span>
+          </div>
+          <p class="pas__note">La virgule avance de deux rangs vers la droite.</p>
+        </div>
+      </div>
+
+      <p class="texte" style="margin-top:14px">Quinze écritures à transformer, sans calculatrice.</p>
+      <div class="actions">
+        <button class="btn" type="button" id="btn-commencer">Commencer
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== QUESTION ===================== -->
+    <section class="ecran" id="ecran-question">
+      <div class="progression">
+        <div class="progression__ligne"><span id="prog-texte">Question 1 sur 15</span><span>Pourcentage</span></div>
+        <div class="barre" role="progressbar" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0" id="prog-barre"><span></span></div>
+      </div>
+      <div id="zone"></div>
+      <div class="suite" id="suite">
+        <button class="btn" type="button" id="btn-suivant">Question suivante
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== FIN ===================== -->
+    <section class="ecran" id="ecran-fin" aria-labelledby="titre-fin">
+      <h2 id="titre-fin">Retrouver le pourcentage : terminé !</h2>
+      <div class="bilan" style="margin-top:14px">
+        <div class="bilan__carte bilan__carte--ok"><span class="bilan__nombre" id="bilan-ok">0 / 15</span><span class="bilan__libelle">réussies du premier coup</span></div>
+        <div class="bilan__carte bilan__carte--aide"><span class="bilan__nombre" id="bilan-aide">0</span><span class="bilan__libelle">réussies après un indice</span></div>
+      </div>
+      <div class="methode">
+        <h3>La méthode</h3>
+        <ol>
+          <li><b>À partir d’une fraction :</b> je la mets sur 100, le nombre du haut est le pourcentage.</li>
+          <li><b>À partir d’un décimal :</b> j’avance la virgule de deux rangs vers la droite.</li>
+        </ol>
+      </div>
+      <div class="actions">
+        <button class="btn btn--secondaire" type="button" id="btn-recommencer">Recommencer</button>
+        <a class="btn" href="mini-evaluations-trigonometrie.html">Retour</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot reveal" style="--d:240ms">
+    <span>Une application conçue par ton professeur.</span>
+    <span>Première Bac Pro · ERA · TEBE · TMA</span>
+  </footer>
+</div>
+
+<script>
+/* =============================================================
+   RETROUVER LE POURCENTAGE — depuis une fraction ou un décimal
+   A. Les quinze questions   B. Le chemin vers 100
+   C. Affichage et indices   D. Déroulé
+   ============================================================= */
+(function () {
+'use strict';
+
+/* ------------------------------------------------------------
+   A. LES QUESTIONS — on alterne les deux départs
+   { f: [n, d] } une fraction · { d: valeur } un décimal
+   Tous les dénominateurs divisent 100 : le calcul reste mental.
+   ------------------------------------------------------------ */
+const QUESTIONS = [
+  { f: [1, 2] },   { d: 0.25 },  { f: [3, 4] },   { d: 0.2 },   { f: [3, 5] },
+  { d: 0.7 },      { f: [1, 10] }, { d: 0.9 },    { f: [1, 4] }, { d: 0.05 },
+  { f: [7, 10] },  { d: 0.35 },  { f: [9, 20] },  { d: 0.6 },   { f: [12, 25] },
+];
+const NB = QUESTIONS.length;
+
+/* ------------------------------------------------------------
+   B. MODÈLE
+   ------------------------------------------------------------ */
+const pgcd = (a, b) => b ? pgcd(b, a % b) : Math.abs(a);
+const fr = x => String(x).replace('.', ',');
+function modele(Q) {
+  if (Q.d !== undefined) return { type: 'dec', dec: Q.d, pct: Math.round(Q.d * 1000) / 10 };
+  const [n, d] = Q.f, k = 100 / d;
+  return { type: 'frac', n, d, k, pct: n * k, dec: n / d };
+}
+
+/* ------------------------------------------------------------
+   C. AFFICHAGE
+   ------------------------------------------------------------ */
+const $ = id => document.getElementById(id);
+const ui = { prog: $('prog-texte'), barre: $('prog-barre'), zone: $('zone'), suite: $('suite'), suivant: $('btn-suivant') };
+const ecrans = { intro: $('ecran-intro'), question: $('ecran-question'), fin: $('ecran-fin') };
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const tactile = !matchMedia('(hover: hover) and (pointer: fine)').matches;
+const el = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+const FRAC = (num, den) => `<span class="frac"><span class="num">${num}</span><span class="den">${den}</span></span>`;
+const PCT = x => `<span class="pct">${fr(x)}<span class="sym">%</span></span>`;
+const message = (sorte, titre, texte) => {
+  const icone = sorte === 'juste' ? '<svg viewBox="0 0 24 24"><path d="M5 12l5 5L19 7"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M12 7v5M12 16h.01"/></svg>';
+  return `<div class="message message--${sorte}"><span class="message__icone" aria-hidden="true">${icone}</span><p>${titre ? `<b>${titre}</b>` : ''}${texte}</p></div>`;
+};
+const montrer = nom => { for (const k in ecrans) ecrans[k].classList.toggle('actif', k === nom); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); };
+const lireDecimal = c => { const t = c.value.trim().replace(',', '.').replace(/\s/g, ''); if (t === '') return null; const v = parseFloat(t); return isNaN(v) ? NaN : v; };
+
+let index = 0, erreurs = 0;
+const bilan = { premierCoup: 0, apresIndice: 0 };
+
+/* Les indices, du plus léger au plus précis */
+function indices(M) {
+  if (M.type === 'dec') return [
+    'Un pourcentage se compte sur 100 : multiplie par 100.',
+    `Avance la virgule de deux rangs vers la droite : ${fr(M.dec)} devient ${fr(M.pct)}.`,
+    `${fr(M.dec)} = ${FRAC(M.pct, 100)}, donc ${PCT(M.pct)}.`,
+  ];
+  return [
+    'Mets la fraction sur 100 : le nombre du haut sera le pourcentage.',
+    `Par combien faut-il multiplier ${M.d} pour obtenir 100 ? Multiplie le haut par le même nombre.`,
+    `${FRAC(M.n, M.d)} = ${FRAC(M.pct, 100)}, donc ${PCT(M.pct)}.`,
+  ];
+}
+/* Le chemin complet, une fois la réponse trouvée */
+function chemin(M) {
+  const etapes = M.type === 'dec'
+    ? [fr(M.dec), FRAC(M.pct, 100), PCT(M.pct)]
+    : [FRAC(M.n, M.d), FRAC(M.pct, 100), PCT(M.pct)];
+  const html = etapes.map((e, i) => `${i ? `<span class="apparait" style="--d:${i * .35}s">=</span>` : ''}<span class="apparait" style="--d:${i * .35}s">${e}</span>`).join('');
+  const note = M.type === 'dec'
+    ? 'La virgule avance de deux rangs vers la droite.'
+    : `On multiplie le haut et le bas par ${M.k} pour arriver sur 100.`;
+  return `<div class="chemin"><div class="ligne-math">${html}</div><p>${note}</p></div>`;
+}
+
+function afficherQuestion() {
+  const M = modele(QUESTIONS[index]); erreurs = 0;
+  const aides = indices(M);
+  ui.prog.textContent = `Question ${index + 1} sur ${NB}`;
+  ui.barre.setAttribute('aria-valuenow', index); ui.barre.firstElementChild.style.width = `${index / NB * 100}%`;
+  ui.suite.classList.remove('visible');
+  ui.suivant.textContent = index === NB - 1 ? 'Voir le bilan' : 'Question suivante';
+  ui.suivant.insertAdjacentHTML('beforeend', ` <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:17px;height:17px"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`);
+
+  const quoi = M.type === 'dec' ? 'ce nombre décimal' : 'cette fraction';
+  const bloc = el(`<div>
+    <p class="consigne">Transforme ${quoi} en pourcentage :</p>
+    <div class="donnee">${M.type === 'dec' ? fr(M.dec) : FRAC(M.n, M.d)}</div>
+    <div class="reponse">
+      <span style="color:var(--se-ink-3)">=</span>
+      <span class="pct">
+        <input class="champ" data-champ="pct" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Pourcentage" placeholder="…">
+        <span class="sym">%</span>
+      </span>
+    </div>
+    <div class="retour-eleve" data-fb></div>
+    <div class="pied-etape"><button type="button" class="btn" data-verifier>Vérifier</button></div>
+  </div>`);
+  ui.zone.innerHTML = ''; ui.zone.appendChild(bloc);
+  const champ = bloc.querySelector('[data-champ="pct"]'), fb = bloc.querySelector('[data-fb]'), btn = bloc.querySelector('[data-verifier]');
+  if (!tactile) champ.focus({ preventScroll: true });
+  let fini = false;
+
+  const valider = () => {
+    if (fini) { ui.suivant.click(); return; }
+    const v = lireDecimal(champ);
+    if (v === null) { fb.innerHTML = message('aide', '', 'Écris un nombre, par exemple 50.'); return; }
+    if (Number.isNaN(v)) { fb.innerHTML = message('aide', '', 'Écris seulement un nombre.'); return; }
+    if (Math.abs(v - M.pct) < 1e-9) {
+      fini = true;
+      champ.value = fr(M.pct); champ.classList.remove('fausse'); champ.classList.add('bonne'); champ.readOnly = true;
+      btn.remove();
+      fb.innerHTML = message('juste', 'Exact !', '') + chemin(M);
+      if (erreurs === 0) bilan.premierCoup++; else bilan.apresIndice++;
+      ui.suite.classList.add('visible');
+      if (!tactile) ui.suivant.focus({ preventScroll: true }); else ui.suivant.blur();
+      if (!reduceMotion) requestAnimationFrame(() => fb.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+      return;
+    }
+    champ.classList.add('fausse');
+    // Les erreurs typiques, chacune dans le vocabulaire de SON départ :
+    // la virgule pour un décimal, la multiplication vers 100 pour une fraction.
+    let texte;
+    if (Math.abs(v - M.dec) < 1e-9) {
+      texte = M.type === 'dec'
+        ? `${fr(M.dec)} est le nombre de départ. Le pourcentage se compte sur 100 : multiplie par 100.`
+        : `${fr(M.dec)} est l’écriture décimale de cette fraction. Le pourcentage, lui, se compte sur 100.`;
+    } else if (M.type === 'dec' && Math.abs(v - M.pct / 10) < 1e-9) {
+      texte = 'La virgule n’a avancé que d’un rang : il en faut deux.';
+    } else if (M.type === 'dec' && Math.abs(v - M.pct * 10) < 1e-9) {
+      texte = 'La virgule a avancé d’un rang de trop : il en faut deux, pas trois.';
+    } else if (M.type === 'frac' && Math.abs(v - M.n) < 1e-9) {
+      texte = `${M.n}, c’est le nombre du haut avant de mettre la fraction sur 100. Multiplie le haut et le bas par ${M.k}.`;
+    } else if (M.type === 'frac' && Math.abs(v - M.d) < 1e-9) {
+      texte = `${M.d}, c’est le nombre du bas. C’est lui qu’il faut amener à 100, et le haut suit.`;
+    } else if (M.type === 'frac' && (Math.abs(v - M.pct / 10) < 1e-9 || Math.abs(v - M.pct * 10) < 1e-9)) {
+      texte = `Vérifie : par combien faut-il multiplier ${M.d} pour obtenir 100 ?`;
+    } else {
+      texte = aides[Math.min(erreurs, aides.length - 1)];
+    }
+    erreurs++;
+    fb.innerHTML = message('aide', 'Pas encore.', texte);
+    if (!reduceMotion) fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+  btn.addEventListener('click', valider);
+  champ.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); champ.blur(); valider(); } });
+}
+
+/* ------------------------------------------------------------
+   D. DÉROULÉ ET BILAN
+   ------------------------------------------------------------ */
+function demarrer() { index = 0; bilan.premierCoup = 0; bilan.apresIndice = 0; montrer('question'); afficherQuestion(); }
+function suivante() { index++; if (index >= NB) { terminer(); return; } afficherQuestion(); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); }
+function terminer() { $('bilan-ok').textContent = `${bilan.premierCoup} / ${NB}`; $('bilan-aide').textContent = String(bilan.apresIndice); montrer('fin'); }
+$('btn-commencer').addEventListener('click', demarrer);
+$('btn-recommencer').addEventListener('click', demarrer);
+ui.suivant.addEventListener('click', suivante);
+requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.add('is-ready')));
+
+/* Contrôle interne : chaque fraction se met sur 100 avec un entier,
+   et le pourcentage correspond bien à la valeur de départ. */
+QUESTIONS.forEach(Q => {
+  const M = modele(Q);
+  if (M.type === 'frac') console.assert(Number.isInteger(M.k) && Number.isInteger(M.pct), 'pas mental', Q, M);
+  console.assert(Math.abs(M.dec * 100 - M.pct) < 1e-9, 'pourcentage faux', Q, M);
+});
+})();
+
+/* Retour : si l'élève vient d'une page précédente, on y revient exactement */
+(function () {
+  const lien = document.querySelector('a.retour');
+  if (!lien) return;
+  lien.addEventListener('click', e => {
+    if (window.history.length <= 1) return;
+    e.preventDefault();
+    const garde = setTimeout(() => { window.location.href = lien.href; }, 400);
+    window.addEventListener('pagehide', () => clearTimeout(garde), { once: true });
+    window.history.back();
+  });
+})();
+</script>
+</body>
+</html>
