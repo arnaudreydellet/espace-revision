@@ -15,15 +15,14 @@
 
 <style>
 /* =============================================================
-   1. JETONS — charte Stud'Éval (identiques aux autres pages)
+   1. JETONS — charte Stud'Éval
    ============================================================= */
 :root {
   --se-blue: #2F63F5; --se-blue-700: #244FCC; --se-blue-300: #93B4FD; --se-blue-200: #C6D4FD;
   --se-blue-100: #E6EDFF; --se-blue-50: #F3F6FE;
   --se-ink: #0B1526; --se-ink-2: #4A5878; --se-ink-3: #8A96B3;
   --se-line: #DDE4F2; --se-line-2: #E9EEF8; --se-bg: #F7F9FD; --se-card: #FFFFFF;
-  --se-ok: #1B9E5A; --se-ok-100: #DFF5E8;
-  --r-card: 16px; --r-btn: 12px;
+  --r-card: 18px; --r-btn: 12px;
   --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --math: 'Times New Roman', Times, serif;
   --ease: cubic-bezier(.22,.8,.22,1);
@@ -43,78 +42,98 @@ body::before {
   background-size: 24px 24px;
   -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
 }
-.app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; max-width: 900px; margin: 0 auto;
+button, a { touch-action: manipulation; }
+.app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; max-width: 1000px; margin: 0 auto;
   padding: calc(16px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal)); }
 @media (min-width: 760px) { .app { padding: calc(26px + var(--sat)) calc(32px + var(--sar)) calc(24px + var(--sab)) calc(32px + var(--sal)); } }
 
-.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 32px; }
-.brand { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 2px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
 .brand svg { width: 22px; height: 18px; display: block; }
 .badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
-.retour { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin-top: 22px; min-height: 40px; padding: 0 4px; color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none; border-radius: 8px; transition: color .25s; }
+.retour { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; margin: 16px 0 0 -6px; min-height: 48px; padding: 4px 10px 4px 6px; color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none; border-radius: 8px; transition: color .25s; }
 .retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
 .retour:hover { color: var(--se-blue); } .retour:hover svg { transform: translateX(-3px); }
 .retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
 
-.hero { padding: 6px 0 20px; }
-@media (min-width: 760px) { .hero { padding: 10px 0 26px; } }
+.hero { padding: 4px 0 20px; }
+@media (min-width: 760px) { .hero { padding: 8px 0 26px; } }
 .hero__context { margin: 0 0 8px; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
 .hero h1 { margin: 0 0 8px; font-size: clamp(28px, 6.6vw, 42px); font-weight: 700; line-height: 1.05; letter-spacing: -.028em; }
-.hero__sub { margin: 0; font-size: clamp(15px, 2vw, 17px); line-height: 1.5; color: var(--se-ink-2); }
+.hero__sub { margin: 0; max-width: 48ch; font-size: clamp(15px, 2vw, 17px); line-height: 1.5; color: var(--se-ink-2); }
 
 /* =============================================================
-   3. LA LISTE DES EXERCICES — un seul gabarit de carte
+   3. LES DEUX CARTES — même gabarit que la page du chapitre
    ============================================================= */
-.grille { display: grid; grid-template-columns: 1fr; gap: 12px; }
-@media (min-width: 620px) { .grille { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
+.choix { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 760px) { .choix { grid-template-columns: 1fr 1fr; gap: 22px; } }
 
-.exo {
-  position: relative; display: flex; gap: 14px; align-items: stretch;
-  background: var(--se-card); border: 1px solid var(--se-line); border-radius: var(--r-card);
-  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 6px 18px -10px rgba(11,21,38,.10);
-  text-decoration: none; color: inherit; overflow: hidden; padding: 14px;
-  transition: transform .4s var(--ease), box-shadow .4s var(--ease), border-color .3s;
-  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+.carte {
+  position: relative; display: flex; flex-direction: column;
+  background: var(--se-card); border: 1px solid var(--se-blue-200); border-radius: var(--r-card);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 8px 22px -12px rgba(47,99,245,.18);
+  text-decoration: none; color: inherit; overflow: hidden;
+  transition: transform .45s var(--ease), box-shadow .45s var(--ease), border-color .35s;
+  -webkit-tap-highlight-color: transparent;
 }
-.exo:hover, .exo:focus-visible {
-  transform: translateY(-2px); border-color: var(--se-blue-200);
-  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 14px 28px -14px rgba(47,99,245,.22);
+.carte:hover, .carte:focus-visible {
+  transform: translateY(-3px); border-color: var(--se-blue-300);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 18px 34px -14px rgba(47,99,245,.26);
 }
-.exo:active { transform: translateY(0) scale(.995); transition-duration: .12s; }
-.exo:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+.carte:active { transform: translateY(-1px) scale(.995); transition-duration: .12s; }
+.carte:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
 
-.motif { position: relative; flex: 0 0 76px; width: 76px; min-height: 76px; border-radius: 12px; background: var(--se-blue-50); display: grid; place-items: center; transition: background .3s; }
-.motif svg { width: 56px; height: 56px; display: block; fill: none; stroke: var(--se-ink-2); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: transform .45s var(--ease); }
-.motif .b { stroke: var(--se-blue); } .motif .dot { fill: var(--se-blue); stroke: none; }
-.motif .lbl { font-family: var(--math); font-style: italic; font-size: 9px; fill: var(--se-blue); stroke: none; }
-.exo:hover .motif { background: var(--se-blue-100); } .exo:hover .motif svg { transform: scale(1.06); }
+.carte__figure { position: relative; aspect-ratio: 2.4 / 1; background: var(--se-blue-50); border-bottom: 1px solid var(--se-line-2); }
+@media (min-width: 760px) { .carte__figure { aspect-ratio: 2.2 / 1; } }
+.carte__figure svg { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform .6s var(--ease); transform-origin: 50% 55%; }
+.carte:hover .carte__figure svg { transform: scale(1.02); }
 
-.corps { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding: 2px 0; }
-.num { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--se-blue); }
-.exo h2 { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.2; letter-spacing: -.015em; }
-.exo p { margin: 0; font-size: 13px; line-height: 1.4; color: var(--se-ink-3); }
-.pied { margin-top: auto; padding-top: 10px; display: flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 600; color: var(--se-blue); }
-.pied svg { width: 15px; height: 15px; transition: transform .3s var(--ease); }
-.exo:hover .pied svg { transform: translateX(3px); }
-
-@media (min-width: 620px) {
-  .exo { flex-direction: column; gap: 12px; padding: 14px 14px 18px; }
-  .motif { flex: 0 0 auto; width: auto; min-height: 104px; }
-  .motif svg { width: 64px; height: 64px; }
-  .corps { padding: 0 4px; gap: 5px; }
-  .exo h2 { font-size: 18px; }
+.carte__body { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px 20px; }
+@media (min-width: 760px) { .carte__body { padding: 22px 24px 24px; gap: 8px; } }
+.carte__step { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--se-blue); }
+.carte__body h2 { margin: 0; font-size: clamp(20px, 2.5vw, 24px); font-weight: 700; letter-spacing: -.02em; line-height: 1.18; }
+.carte__body p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--se-ink-2); }
+.btn {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 9px;
+  margin-top: 10px; min-height: 46px; padding: 11px 18px;
+  border-radius: var(--r-btn); background: var(--se-blue); color: #fff;
+  font-weight: 600; font-size: 15px; transition: background .25s;
 }
+.btn svg { width: 17px; height: 17px; transition: transform .35s var(--ease); }
+.carte:hover .btn { background: var(--se-blue-700); }
+.carte:hover .btn svg, .carte:focus-visible .btn svg { transform: translateX(4px); }
+@media (max-width: 520px) { .btn { width: 100%; justify-content: center; min-height: 50px; } }
 
-.note { margin: 18px 2px 0; font-size: 13px; color: var(--se-ink-3); }
+/* =============================================================
+   4. LES DEUX FIGURES
+   Gauche : la pile d'exercices du chapitre. Droite : la feuille
+   courte d'une mini-évaluation, dont les cases se cochent.
+   ============================================================= */
+.fig-grid { fill: url(#gridpat); }
+.f-feuille { fill: var(--se-card); stroke: var(--se-ink-2); stroke-width: 1.6; }
+.f-feuille--pale { fill: var(--se-card); stroke: var(--se-blue-300); stroke-width: 1.4; }
+.f-pli { fill: var(--se-blue-50); stroke: var(--se-ink-2); stroke-width: 1.4; }
+.f-ligne { stroke: var(--se-blue-200); stroke-width: 3; stroke-linecap: round; }
+.f-ligne--forte { stroke: var(--se-blue); }
+.f-case { fill: none; stroke: var(--se-ink-2); stroke-width: 1.5; }
+.f-coche { fill: none; stroke: var(--se-blue); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 16; stroke-dashoffset: 16; }
+.f-num { font-family: var(--font); font-size: 11px; font-weight: 600; fill: var(--se-ink-3); }
+.f-entre { opacity: 0; }
+/* Une seule séquence, au chargement : les feuilles se posent, puis les coches */
+.js.is-ready .f-entre { animation: appear .7s ease calc(.4s + var(--i, 0) * .22s) forwards; }
+.js.is-ready .f-coche { animation: coche .5s var(--ease) calc(1.1s + var(--i, 0) * .5s) forwards; }
+@keyframes appear { to { opacity: 1; } }
+@keyframes coche { to { stroke-dashoffset: 0; } }
+
 .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 26px 2px 0; font-size: 12.5px; color: var(--se-ink-3); }
-
 .js .reveal { opacity: 0; transform: translateY(10px); }
 .js.is-ready .reveal { animation: rise .8s var(--ease) var(--d, 0ms) forwards; }
 @keyframes rise { to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .js .reveal { opacity: 1; transform: none; }
-  .exo:hover { transform: none; }
+  .js .reveal, .f-entre { opacity: 1; transform: none; }
+  .f-coche { stroke-dashoffset: 0; }
+  .carte:hover { transform: none; }
 }
 </style>
 </head>
@@ -138,86 +157,109 @@ body::before {
   <header class="hero">
     <p class="hero__context reveal" style="--d:80ms">Mathématiques · Chapitre 01 · Trigonométrie</p>
     <h1 class="reveal" style="--d:140ms">Je m’entraîne</h1>
-    <p class="hero__sub reveal" style="--d:200ms">Choisis l’exercice que tu veux travailler.</p>
+    <p class="hero__sub reveal" style="--d:200ms">Que veux-tu préparer ?</p>
   </header>
 
-  <!-- La liste est remplie par le script à partir de EXERCICES -->
-  <main class="grille reveal" style="--d:280ms" id="grille" aria-label="Exercices du chapitre"></main>
-  <noscript><p style="color:#4A5878">Active JavaScript pour afficher les exercices.</p></noscript>
+  <main class="choix" aria-label="Choisir un entraînement">
 
-  <p class="note reveal" style="--d:360ms">D’autres exercices seront ajoutés au fil du chapitre.</p>
+    <!-- ---------- Évaluation du chapitre ---------- -->
+    <a class="carte reveal" style="--d:280ms" href="entrainement-chapitre-trigonometrie.html">
+      <div class="carte__figure" aria-hidden="true">
+        <svg viewBox="0 0 360 150" focusable="false">
+          <defs>
+            <pattern id="gridpat" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M20 0H0V20" fill="none" stroke="#2F63F5" stroke-opacity=".07" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect class="fig-grid" width="360" height="150"/>
+          <!-- Une pile de feuilles : tout le chapitre -->
+          <g class="f-entre" style="--i:0"><rect class="f-feuille--pale" x="96" y="18" width="128" height="104" rx="3" transform="rotate(-6 160 70)"/></g>
+          <g class="f-entre" style="--i:1"><rect class="f-feuille--pale" x="112" y="20" width="128" height="104" rx="3" transform="rotate(3 176 72)"/></g>
+          <g class="f-entre" style="--i:2">
+            <path class="f-feuille" d="M118 22 H222 L246 46 V128 H118 Z"/>
+            <path class="f-pli" d="M222 22 L246 46 H222 Z"/>
+            <g transform="translate(136 62)">
+              <line class="f-ligne f-ligne--forte" x1="0" y1="0" x2="88" y2="0"/>
+              <line class="f-ligne" x1="0" y1="18" x2="72" y2="18"/>
+              <line class="f-ligne" x1="0" y1="36" x2="84" y2="36"/>
+              <line class="f-ligne" x1="0" y1="54" x2="60" y2="54"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="carte__body">
+        <span class="carte__step">TOUT LE CHAPITRE</span>
+        <h2>Je m’entraîne pour l’évaluation du chapitre</h2>
+        <p>Tous les exercices de la trigonométrie, dans l’ordre que tu veux.</p>
+        <span class="btn">Voir les exercices
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </div>
+    </a>
 
-  <footer class="foot reveal" style="--d:420ms">
+    <!-- ---------- Mini-évaluations ---------- -->
+    <a class="carte reveal" style="--d:380ms" href="mini-evaluations-trigonometrie.html">
+      <div class="carte__figure" aria-hidden="true">
+        <svg viewBox="0 0 360 150" focusable="false">
+          <rect class="fig-grid" width="360" height="150"/>
+          <!-- Une feuille courte : trois questions, les cases se cochent -->
+          <g class="f-entre" style="--i:0" transform="translate(112 16)">
+            <path class="f-feuille" d="M0 0 H112 L136 24 V118 H0 Z"/>
+            <path class="f-pli" d="M112 0 L136 24 H112 Z"/>
+            <g transform="translate(18 40)">
+              <text class="f-num" x="0" y="4">1</text>
+              <rect class="f-case" x="14" y="-9" width="18" height="18" rx="3"/>
+              <path class="f-coche" style="--i:0" d="M18 0 l4 4 l8 -9"/>
+              <line class="f-ligne" x1="42" y1="0" x2="96" y2="0"/>
+            </g>
+            <g transform="translate(18 70)">
+              <text class="f-num" x="0" y="4">2</text>
+              <rect class="f-case" x="14" y="-9" width="18" height="18" rx="3"/>
+              <path class="f-coche" style="--i:1" d="M18 0 l4 4 l8 -9"/>
+              <line class="f-ligne" x1="42" y1="0" x2="82" y2="0"/>
+            </g>
+            <g transform="translate(18 100)">
+              <text class="f-num" x="0" y="4">3</text>
+              <rect class="f-case" x="14" y="-9" width="18" height="18" rx="3"/>
+              <path class="f-coche" style="--i:2" d="M18 0 l4 4 l8 -9"/>
+              <line class="f-ligne" x1="42" y1="0" x2="90" y2="0"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="carte__body">
+        <span class="carte__step">ENTRAÎNEMENT CIBLÉ</span>
+        <h2>Je m’entraîne pour les mini-évaluations</h2>
+        <p>Une compétence à la fois, celle qui sera évaluée en classe.</p>
+        <span class="btn">Voir les mini-évaluations
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
+      </div>
+    </a>
+
+  </main>
+
+  <footer class="foot reveal" style="--d:480ms">
     <span>Une application conçue par ton professeur.</span>
     <span>Première Bac Pro · ERA · TEBE · TMA</span>
   </footer>
 </div>
 
 <script>
-/* =============================================================
-   LES EXERCICES DU CHAPITRE — tout se règle ici.
-   Pour ajouter un exercice : une ligne de plus dans EXERCICES.
-   ============================================================= */
-const EXERCICES = [
-  { num: '01', titre: 'Reconnaître les côtés',      sous: 'Hypoténuse · adjacent · opposé',       href: 'entrainement-trigonometrie-01.html', motif: 'cotes' },
-  { num: '02', titre: 'Sinus ou cosinus ?',          sous: 'Choisir la bonne formule',             href: 'entrainement-trigonometrie-03.html', motif: 'formule' },
-  { num: '03', titre: 'Calculer une longueur',       sous: 'Avec le sinus ou le cosinus',          href: 'entrainement-trigonometrie-02.html',  motif: 'longueur' },
-  { num: '04', titre: 'Simplifier une fraction',     sous: '2/4 = 1/2 = 0,5',                      href: 'entrainement-fractions-equivalentes.html', motif: 'fractions' },
-  { num: '05', titre: 'Longueur sur un cercle',      sous: 'Le point M tourne sur le cercle',      href: 'entrainement-trigonometrie-05.html', motif: 'cercle' },
-];
-
-/* Motifs (viewBox 0 0 40 40) : une seule idée par icône, lisible d'un coup d'œil */
-const MOTIFS = {
-  // 01 — un triangle rectangle, un côté mis en avant, « ? » : quel côté est-ce ?
-  cotes: `
-    <path d="M6 33 L34 33 L34 9 Z" stroke="#4A5878"/>
-    <path d="M28 33 v-6 h6" stroke="#4A5878" stroke-width="1.2"/>
-    <path class="b" d="M6 33 L34 9" stroke-width="3"/>
-    <text x="14" y="17" font-family="Sora, sans-serif" font-size="13" font-weight="700" fill="#2F63F5" stroke="none">?</text>`,
-  // 02 — sin / cos, le choix
-  formule: `
-    <text x="20" y="17" text-anchor="middle" font-family="Times New Roman, serif" font-size="14" fill="#2F63F5" stroke="none">sin</text>
-    <text x="20" y="34" text-anchor="middle" font-family="Times New Roman, serif" font-size="14" fill="#4A5878" stroke="none">cos</text>
-    <text x="20" y="25.5" text-anchor="middle" font-family="Sora, sans-serif" font-size="8" font-weight="700" fill="#8A96B3" stroke="none">ou</text>`,
-  // 03 — un triangle avec un côté connu et un côté à calculer
-  longueur: `
-    <path d="M6 33 L34 33 L34 9 Z" stroke="#4A5878"/>
-    <path d="M28 33 v-6 h6" stroke="#4A5878" stroke-width="1.2"/>
-    <text x="20" y="39" text-anchor="middle" font-family="Sora, sans-serif" font-size="7.5" font-weight="600" fill="#4A5878" stroke="none">6 cm</text>
-    <text x="16" y="19" text-anchor="middle" font-family="Sora, sans-serif" font-size="12" font-weight="700" fill="#2F63F5" stroke="none">?</text>`,
-  // 04 — 2/4 = 1/2
-  fractions: `
-    <g style="font-family:'Times New Roman',serif;stroke:none">
-      <text x="9" y="16" text-anchor="middle" font-size="13" fill="#4A5878">2</text>
-      <line x1="2" y1="20" x2="16" y2="20" stroke="#4A5878" stroke-width="1.4"/>
-      <text x="9" y="33" text-anchor="middle" font-size="13" fill="#4A5878">4</text>
-      <text x="20" y="24.5" text-anchor="middle" font-size="11" fill="#8A96B3">=</text>
-      <text x="31" y="16" text-anchor="middle" font-size="13" fill="#2F63F5">1</text>
-      <line x1="24" y1="20" x2="38" y2="20" stroke="#2F63F5" stroke-width="1.4"/>
-      <text x="31" y="33" text-anchor="middle" font-size="13" fill="#2F63F5">2</text>
-    </g>`,
-  // 05 — un cercle, l'arc parcouru, le point M
-  cercle: `
-    <circle cx="20" cy="21" r="14" stroke="#4A5878"/>
-    <path class="b" d="M34 21 A14 14 0 0 0 20 7" stroke-width="3"/>
-    <line x1="20" y1="21" x2="34" y2="21" stroke="#8A96B3" stroke-width="1.2"/>
-    <circle class="dot" cx="20" cy="7" r="2.6"/>
-    <text x="24" y="6" font-family="Times New Roman, serif" font-style="italic" font-size="9" fill="#2F63F5" stroke="none">M</text>`,
-};
-const FLECHE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
-
-document.getElementById('grille').innerHTML = EXERCICES.map(e => `
-  <a class="exo" href="${e.href}">
-    <span class="motif" aria-hidden="true"><svg viewBox="0 0 40 40">${MOTIFS[e.motif] || ''}</svg></span>
-    <span class="corps">
-      <span class="num">EXERCICE ${e.num}</span>
-      <h2>${e.titre}</h2>
-      <p>${e.sous}</p>
-      <span class="pied">Commencer ${FLECHE}</span>
-    </span>
-  </a>`).join('');
-
 requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.add('is-ready')));
+
+/* Retour : si l'élève vient de la page du chapitre, on y revient exactement */
+(function () {
+  const lien = document.querySelector('a.retour');
+  if (!lien) return;
+  lien.addEventListener('click', e => {
+    if (window.history.length <= 1) return;
+    e.preventDefault();
+    const garde = setTimeout(() => { window.location.href = lien.href; }, 400);
+    window.addEventListener('pagehide', () => clearTimeout(garde), { once: true });
+    window.history.back();
+  });
+})();
 </script>
 </body>
 </html>
