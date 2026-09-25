@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Le sens conventionnel du cercle trigonométrique — Trigonométrie</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval, mêmes couleurs de côtés que
+   l'animation « côté adjacent et opposé »
+     hypoténuse : gris-bleu · adjacent : bleu · opposé : bleu nuit
+   ============================================================= */
+:root {
+  --se-blue: #2F63F5; --se-blue-700: #244FCC; --se-blue-300: #93B4FD; --se-blue-200: #C6D4FD;
+  --se-blue-100: #E6EDFF; --se-blue-50: #F3F6FE;
+  --se-ink: #0B1526; --se-ink-2: #4A5878; --se-ink-3: #8A96B3;
+  --se-line: #DDE4F2; --se-line-2: #E9EEF8; --se-bg: #F7F9FD; --se-card: #FFFFFF;
+  --c-hyp: #6B7A99; --c-adj: #2F63F5; --c-opp: #0B1526;
+  --r-card: 18px; --r-btn: 12px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --math: 'Times New Roman', Times, serif;
+  --ease: cubic-bezier(.22,.8,.22,1);
+  --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100dvh; font-family: var(--font); color: var(--se-ink); background: var(--se-bg); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(to right, rgba(47,99,245,.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+button, a { touch-action: manipulation; }
+.app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; max-width: 640px; margin: 0 auto;
+  padding: calc(14px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal)); }
+@media (min-width: 760px) { .app { padding: calc(24px + var(--sat)) calc(32px + var(--sar)) calc(28px + var(--sab)) calc(32px + var(--sal)); } }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 2px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.retour { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; margin: 6px 0 0 -6px; min-height: 48px; padding: 4px 10px 4px 6px; color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none; border-radius: 8px; transition: color .25s; }
+.retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
+.retour:hover { color: var(--se-blue); } .retour:hover svg { transform: translateX(-3px); }
+.retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+.contexte { margin: 2px 0 10px; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+
+/* =============================================================
+   3. LA CARTE — tout est à l'intérieur
+   ============================================================= */
+.carte {
+  position: relative; padding: 14px 14px 18px;
+  background: var(--se-card); border: 1px solid var(--se-line); border-radius: var(--r-card);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 8px 22px -14px rgba(11,21,38,.12);
+}
+.entete-carte { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.avance { flex: 1; height: 4px; border-radius: 999px; background: var(--se-blue-100); overflow: hidden; }
+.avance span { display: block; height: 100%; width: 0; background: var(--se-blue); border-radius: 999px; transition: width .5s var(--ease); }
+.compteur { font-size: 12.5px; font-weight: 600; color: var(--se-ink-3); white-space: nowrap; }
+
+/* --- La scène : le cercle, le point M, les deux sens --- */
+#scene { display: block; width: 100%; height: auto; max-height: 38vh; margin: 4px auto 0; }
+@media (min-width: 760px) { #scene { max-height: 300px; } }
+.axe { stroke: var(--se-line); stroke-width: 1.2; stroke-dasharray: 3 4; }
+.cercle { fill: none; stroke: var(--se-ink-2); stroke-width: 2; }
+.parcours { fill: none; stroke: var(--se-blue); stroke-width: 6; stroke-linecap: round; transition: stroke .5s; }
+.parcours.negatif { stroke: var(--se-ink-3); }
+.point { fill: var(--se-ink-2); }
+.point-m { fill: var(--se-blue); stroke: #fff; stroke-width: 2.5; transition: fill .5s, opacity .5s; }
+.point-m.negatif { fill: var(--se-ink-2); }
+.lettre { font-family: var(--math); font-style: italic; font-size: 20px; fill: var(--se-ink-2); text-anchor: middle; dominant-baseline: central; transition: opacity .5s; }
+.lettre-m { font-family: var(--math); font-style: italic; font-weight: 700; font-size: 21px; fill: var(--se-blue); text-anchor: middle; dominant-baseline: central; transition: opacity .5s, fill .5s; }
+.lettre-m.negatif { fill: var(--se-ink-2); }
+.sens { fill: none; stroke-width: 3; stroke-linecap: round; opacity: 0; transition: opacity .6s var(--ease), stroke .5s; }
+.sens.vue { opacity: 1; }
+.sens-pos { stroke: var(--se-blue); } .sens-neg { stroke: var(--se-ink-3); }
+.sens.neutre { stroke: var(--se-ink-3); }
+.pointe { opacity: 0; transition: opacity .6s var(--ease), fill .5s; }
+.pointe.vue { opacity: 1; }
+.pointe-pos { fill: var(--se-blue); } .pointe-neg { fill: var(--se-ink-3); }
+.pointe.neutre { fill: var(--se-ink-3); }
+.signe { font-family: var(--font); font-size: 24px; font-weight: 700; text-anchor: middle; dominant-baseline: central; opacity: 0; transition: opacity .6s var(--ease); }
+.signe.vue { opacity: 1; }
+.signe-pos { fill: var(--se-blue); } .signe-neg { fill: var(--se-ink-3); }
+.montre { opacity: 0; transition: opacity .7s var(--ease); }
+.montre.vue { opacity: 1; }
+.montre circle.cadran { fill: var(--se-card); stroke: var(--se-ink-2); stroke-width: 1.6; }
+.montre line { stroke: var(--se-ink-2); stroke-width: 2; stroke-linecap: round; }
+.montre .fl { fill: none; stroke: var(--se-ink-3); stroke-width: 1.8; stroke-linecap: round; }
+.montre .fl-p { fill: var(--se-ink-3); }
+.montre text { font-family: var(--font); font-size: 10.5px; font-weight: 600; fill: var(--se-ink-3); text-anchor: middle; }
+.m-pos { color: var(--se-blue); font-weight: 700; }
+
+/* --- La légende, hauteur réservée --- */
+.legende { min-height: 104px; margin-top: 10px; padding: 12px 4px 0; border-top: 1px solid var(--se-line-2); text-align: center; }
+.legende__titre { margin: 0 0 6px; font-size: 17px; font-weight: 700; line-height: 1.25; letter-spacing: -.015em; color: var(--se-ink); }
+.legende__texte { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--se-ink-2); }
+.legende b { color: var(--se-ink); font-weight: 600; }
+.legende.entre > * { animation: rise .7s var(--ease) both; }
+.legende.entre > *:nth-child(2) { animation-delay: .15s; }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.seg { font-family: var(--math); font-style: italic; }
+.regle { margin: 8px 0 0; font-size: 15.5px; line-height: 1.7; color: var(--se-ink-2); }
+
+/* --- Les boutons, dans la carte --- */
+.commandes { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; margin-top: 16px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; width: 100%; min-height: 50px; padding: 12px 14px; border: 0; border-radius: var(--r-btn); background: var(--se-blue); color: #fff; font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; transition: background .25s, opacity .25s; -webkit-tap-highlight-color: transparent; }
+.btn svg { width: 17px; height: 17px; }
+.btn:hover { background: var(--se-blue-700); }
+.btn:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+.btn--secondaire { background: var(--se-card); color: var(--se-blue); border: 1px solid var(--se-blue-200); }
+.btn--secondaire:hover { background: var(--se-blue-50); }
+.btn[disabled] { opacity: .4; cursor: default; }
+
+
+/* Petit écran : le bouton de gauche prend juste sa place, aucun libellé ne se coupe */
+.commandes .btn { white-space: nowrap; }
+@media (max-width: 380px) {
+  .commandes { grid-template-columns: auto 1fr; }
+  .commandes .btn { font-size: 14.5px; padding: 12px 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+.lettre-inline { font-family: var(--math); font-style: italic; }
+</style>
+</head>
+
+<body>
+<div class="app">
+  <div class="top">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true"><rect x="0" y="10" width="5" height="8" rx="1.2" fill="#93B4FD"/><rect x="8.5" y="5" width="5" height="13" rx="1.2" fill="#6091FA"/><rect x="17" y="0" width="5" height="18" rx="1.2" fill="#2F63F5"/></svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+  <a class="retour" href="revision-trigonometrie.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Retour aux révisions
+  </a>
+  <p class="contexte">Trigonométrie · Je révise · Le sens conventionnel</p>
+
+  <div class="carte">
+    <div class="entete-carte" aria-hidden="true">
+      <div class="avance"><span id="avance"></span></div>
+      <span class="compteur" id="compteur"></span>
+    </div>
+
+    <svg id="scene" viewBox="0 0 360 260" focusable="false" aria-hidden="true">
+      <line class="axe" x1="100" y1="130" x2="260" y2="130"/>
+      <line class="axe" x1="180" y1="50" x2="180" y2="210"/>
+      <circle class="cercle" cx="180" cy="130" r="80"/>
+      <path class="parcours" data-parcours d=""/>
+
+      <!-- les deux sens : des flèches éloignées du cercle -->
+      <path class="sens sens-pos" data-sens="pos" d=""/>
+      <path class="pointe pointe-pos" data-pointe="pos" d=""/>
+      <text class="signe signe-pos" data-signe="pos">+</text>
+      <path class="sens sens-neg" data-sens="neg" d=""/>
+      <path class="pointe pointe-neg" data-pointe="neg" d=""/>
+      <text class="signe signe-neg" data-signe="neg">−</text>
+
+      <!-- la montre : un repère familier, dans le coin -->
+      <g class="montre" data-montre transform="translate(46 118) scale(1.35)">
+        <circle class="cadran" r="19"/>
+        <line x1="0" y1="0" x2="0" y2="-12"/>
+        <line x1="0" y1="0" x2="8" y2="0"/>
+        <path class="fl" d="M 12.6 -21.8 A 25.2 25.2 0 0 1 25.2 0"/>
+        <path class="fl-p" d="M 25.2 0 l -4.2 -6 l 7.6 0.4 z"/>
+        <text y="42">montre</text>
+      </g>
+
+      <circle class="point" cx="180" cy="130" r="3.5"/>
+      <text class="lettre" data-l="O">O</text>
+      <circle class="point" cx="260" cy="130" r="4"/>
+      <text class="lettre" data-l="I">I</text>
+      <circle class="point" cx="180" cy="50" r="4"/>
+      <text class="lettre" data-l="J">J</text>
+
+      <circle class="point-m" data-m r="7" cx="260" cy="130"/>
+      <text class="lettre-m" data-lm>M</text>
+    </svg>
+
+    <div class="legende" id="legende" aria-live="polite"></div>
+
+    <div class="commandes">
+      <button class="btn btn--secondaire" type="button" id="prec">Précédent</button>
+      <button class="btn" type="button" id="suiv"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   LE SENS CONVENTIONNEL DU CERCLE TRIGONOMÉTRIQUE
+   Notations du cours : O le centre, I le point de départ à droite,
+   J le point du haut, M le point qui tourne.
+   Règles du support : flèches de rotation éloignées du cercle,
+   aucune lettre ne touche un tracé.
+   A. Géométrie   B. Les étapes   C. Rendu   D. Navigation
+   ============================================================= */
+(function () {
+'use strict';
+
+/* ------------------------------------------------------------
+   A. GÉOMÉTRIE — angles en degrés, sens positif = anti-horaire
+   ------------------------------------------------------------ */
+const O = [180, 130], R = 80, RF = 122;                 // RF : rayon des flèches de sens, hors du cercle
+const rad = d => d * Math.PI / 180;
+const pt = (a, r = R) => [O[0] + r * Math.cos(rad(a)), O[1] - r * Math.sin(rad(a))];
+const f = n => n.toFixed(2);
+/* un arc de a0 à a1 (degrés) sur le rayon r, dans le sens de a1 − a0 */
+function arc(a0, a1, r = R) {
+  if (Math.abs(a1 - a0) < .01) return '';
+  const p0 = pt(a0, r), p1 = pt(Math.abs(a1 - a0) >= 360 ? a0 + (a1 > a0 ? 359.99 : -359.99) : a1, r);
+  const grand = Math.abs(a1 - a0) > 180 ? 1 : 0, sweep = a1 > a0 ? 0 : 1;
+  return `M${f(p0[0])} ${f(p0[1])} A${r} ${r} 0 ${grand} ${sweep} ${f(p1[0])} ${f(p1[1])}`;
+}
+/* une pointe de flèche posée au bout d'un arc, tangente au mouvement */
+function pointe(a, sens, r = RF) {
+  const p = pt(a, r), t = sens > 0 ? [-Math.sin(rad(a)), -Math.cos(rad(a))] : [Math.sin(rad(a)), Math.cos(rad(a))];
+  const n = [-t[1], t[0]], L = 11, W = 6;
+  const b = [p[0] - t[0] * L, p[1] - t[1] * L];
+  return `M${f(p[0] + t[0] * 2)} ${f(p[1] + t[1] * 2)} L${f(b[0] + n[0] * W)} ${f(b[1] + n[1] * W)} L${f(b[0] - n[0] * W)} ${f(b[1] - n[1] * W)} Z`;
+}
+
+/* ------------------------------------------------------------
+   B. LES ÉTAPES
+   m      : angle de M à la fin de l'étape (null : M caché)
+   depuis : angle d'où M repart (sinon, sa position actuelle)
+   sens   : 'neutre' (deux flèches grises), 'pos', 'neg', 'deux'
+   ------------------------------------------------------------ */
+const L = t => `<span class="lettre-inline">${t}</span>`;
+const ETAPES = [
+  { m: null, sens: null, montre: false,
+    titre: 'Le cercle trigonométrique',
+    texte: `Un cercle de centre ${L('O')}. Le point de départ est toujours ${L('I')}, à droite.` },
+  { m: 0, sens: null, montre: false,
+    titre: 'Le point M',
+    texte: `Au départ, le point ${L('M')} est posé sur ${L('I')}.` },
+  { m: 0, sens: 'neutre', montre: false,
+    titre: 'Deux sens pour tourner',
+    texte: `${L('M')} peut tourner d’un côté ou de l’autre. Il faut choisir <b>un seul sens</b>, le même pour tout le monde.` },
+  { m: 90, depuis: 0, sens: 'pos', montre: false,
+    titre: 'Le sens positif',
+    texte: `Par convention, on tourne dans le <span class="m-pos">sens inverse des aiguilles d’une montre</span>. ${L('M')} monte vers ${L('J')}.` },
+  { m: 90, sens: 'pos', montre: true,
+    titre: 'Un repère : la montre',
+    texte: `Les aiguilles d’une montre tournent dans l’autre sens. Le sens positif, c’est <b>l’inverse</b>.` },
+  { m: 360, depuis: 90, sens: 'pos', montre: false,
+    titre: 'M continue dans le même sens',
+    texte: `Il passe par la gauche, puis par le bas, et revient en ${L('I')} après un <b>tour complet</b>.` },
+  { m: -90, depuis: 0, sens: 'neg', montre: true, negatif: true,
+    titre: 'Le sens négatif',
+    texte: `Tourner dans le sens des aiguilles d’une montre, c’est le <b>sens négatif</b>. ${L('M')} descend au lieu de monter.` },
+  { m: 90, depuis: 0, sens: 'pos', montre: false, fin: true,
+    titre: 'À retenir',
+    texte: `On part de ${L('I')} et on tourne dans le <span class="m-pos">sens inverse des aiguilles d’une montre</span> : c’est le <b>sens positif</b>.` },
+];
+
+/* ------------------------------------------------------------
+   C. RENDU
+   ------------------------------------------------------------ */
+const svg = document.getElementById('scene');
+const q = sel => svg.querySelector(sel);
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let angle = 0, depart = 0, anim = null;
+
+/* Lettres fixes, décalées pour ne toucher ni le cercle ni les axes */
+function lettre(k, a, r) { const p = pt(a, r); const t = q(`[data-l="${k}"]`); t.setAttribute('x', f(p[0])); t.setAttribute('y', f(p[1])); }
+lettre('I', -13, R + 17); lettre('J', 77, R + 17);
+q('[data-l="O"]').setAttribute('x', O[0] - 14); q('[data-l="O"]').setAttribute('y', O[1] + 15);
+
+/* Les flèches de sens : arc de 25° à 65° (positif, en haut) et de −25° à −65° (négatif, en bas) */
+q('[data-sens="pos"]').setAttribute('d', arc(22, 62, RF));
+q('[data-pointe="pos"]').setAttribute('d', pointe(62, +1));
+q('[data-sens="neg"]').setAttribute('d', arc(-22, -62, RF));
+q('[data-pointe="neg"]').setAttribute('d', pointe(-62, -1));
+(() => { const p = pt(42, RF + 20), n = pt(-42, RF + 20);
+  q('[data-signe="pos"]').setAttribute('x', f(p[0])); q('[data-signe="pos"]').setAttribute('y', f(p[1]));
+  q('[data-signe="neg"]').setAttribute('x', f(n[0])); q('[data-signe="neg"]').setAttribute('y', f(n[1])); })();
+
+/* M et son parcours, pour un angle donné */
+function placerM(a, negatif) {
+  const p = pt(a), m = q('[data-m]');
+  m.setAttribute('cx', f(p[0])); m.setAttribute('cy', f(p[1]));
+  // la lettre M se place un peu en avance sur le mouvement, à l'extérieur, loin de I et de J
+  const lm = pt(a + (negatif ? -14 : 14), R + 18), t = q('[data-lm]');
+  t.setAttribute('x', f(lm[0])); t.setAttribute('y', f(lm[1]));
+  const proche = Math.min(...['I', 'J'].map(k => { const e = q(`[data-l="${k}"]`); return Math.hypot(lm[0] - e.getAttribute('x'), lm[1] - e.getAttribute('y')); }));
+  t.style.fillOpacity = Math.max(0, Math.min(1, (proche - 26) / 12));
+  q('[data-parcours]').setAttribute('d', arc(depart, a));
+}
+function tourner(vers, negatif) {
+  if (anim) cancelAnimationFrame(anim);
+  const de = angle;
+  if (reduceMotion || de === vers) { angle = vers; placerM(vers, negatif); return; }
+  const duree = Math.min(4200, 900 + Math.abs(vers - de) * 9);          // un quart de tour ≈ 1,7 s
+  const t0 = performance.now(), doux = u => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+  const pas = now => {
+    const u = Math.min(1, (now - t0) / duree);
+    angle = de + (vers - de) * doux(u);
+    placerM(angle, negatif);
+    anim = u < 1 ? requestAnimationFrame(pas) : null;
+  };
+  anim = requestAnimationFrame(pas);
+}
+function etat(E) {
+  const cache = E.m === null;
+  q('[data-m]').style.opacity = cache ? 0 : 1; q('[data-lm]').style.opacity = cache ? 0 : 1;
+  const neg = !!E.negatif;
+  q('[data-m]').classList.toggle('negatif', neg); q('[data-lm]').classList.toggle('negatif', neg);
+  q('[data-parcours]').classList.toggle('negatif', neg);
+  // flèches de sens
+  const vPos = E.sens === 'pos' || E.sens === 'neutre', vNeg = E.sens === 'neg' || E.sens === 'neutre';
+  for (const [k, v] of [['pos', vPos], ['neg', vNeg]]) {
+    q(`[data-sens="${k}"]`).classList.toggle('vue', v); q(`[data-pointe="${k}"]`).classList.toggle('vue', v);
+    q(`[data-sens="${k}"]`).classList.toggle('neutre', E.sens === 'neutre'); q(`[data-pointe="${k}"]`).classList.toggle('neutre', E.sens === 'neutre');
+    q(`[data-signe="${k}"]`).classList.toggle('vue', v && E.sens !== 'neutre');
+  }
+  q('[data-montre]').classList.toggle('vue', !!E.montre);
+  if (cache) { angle = 0; depart = 0; placerM(0); return; }
+  // M repart de « depuis » (le parcours se redessine à partir de là)
+  if (E.depuis !== undefined) { angle = E.depuis; depart = E.depuis === 90 ? 0 : E.depuis; placerM(angle, neg); }
+  if (E.m === 0) depart = 0;
+  tourner(E.m, neg);
+}
+
+/* ------------------------------------------------------------
+   D. NAVIGATION — un clic par étape
+   ------------------------------------------------------------ */
+const legende = document.getElementById('legende'), barre = document.getElementById('avance'), compteur = document.getElementById('compteur');
+const prec = document.getElementById('prec'), suiv = document.getElementById('suiv');
+const EXERCICE = 'entrainement-trigonometrie-05.html';         // l'exercice « Longueur sur un cercle », qui part de I dans le sens positif
+const FLECHE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+let etape = 0;
+
+function aller(i) {
+  etape = Math.max(0, Math.min(ETAPES.length - 1, i));
+  const E = ETAPES[etape], derniere = !!E.fin;
+  etat(E);
+  legende.innerHTML = `<p class="legende__titre">${E.titre}</p><p class="legende__texte">${E.texte}</p>`;
+  legende.classList.remove('entre'); void legende.offsetWidth; legende.classList.add('entre');
+  barre.style.width = ((etape + 1) / ETAPES.length * 100) + '%';
+  compteur.textContent = `${etape + 1} / ${ETAPES.length}`;
+  prec.disabled = etape === 0;
+  prec.textContent = derniere ? '↺ Revoir' : 'Précédent';
+  suiv.innerHTML = (derniere ? 'Je m’entraîne ' : 'Suivant ') + FLECHE;
+}
+prec.addEventListener('click', () => ETAPES[etape].fin ? aller(0) : aller(etape - 1));
+suiv.addEventListener('click', () => ETAPES[etape].fin ? (window.location.href = EXERCICE) : aller(etape + 1));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); if (!ETAPES[etape].fin) aller(etape + 1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); aller(etape - 1); }
+});
+let x0 = null, y0 = null;
+svg.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+svg.addEventListener('touchend', e => {
+  if (x0 === null) return;
+  const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) { if (dx < 0 && !ETAPES[etape].fin) aller(etape + 1); if (dx > 0) aller(etape - 1); }
+  x0 = null;
+}, { passive: true });
+
+aller(0);
+
+/* Retour : si l'élève vient de la page des révisions, on y revient exactement */
+const lien = document.querySelector('a.retour');
+lien.addEventListener('click', e => {
+  if (window.history.length <= 1) return;
+  e.preventDefault();
+  const garde = setTimeout(() => { window.location.href = lien.href; }, 400);
+  window.addEventListener('pagehide', () => clearTimeout(garde), { once: true });
+  window.history.back();
+});
+})();
+</script>
+</body>
+</html>

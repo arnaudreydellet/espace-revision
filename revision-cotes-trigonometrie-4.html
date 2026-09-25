@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Reconnaître un côté adjacent et opposé — Trigonométrie</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval
+   Les trois côtés se distinguent par la couleur ET par leur nom
+   écrit le long du trait, jamais par la couleur seule.
+     hypoténuse : gris-bleu · adjacent : bleu · opposé : bleu nuit
+   ============================================================= */
+:root {
+  --se-blue: #2F63F5; --se-blue-700: #244FCC; --se-blue-300: #93B4FD; --se-blue-200: #C6D4FD;
+  --se-blue-100: #E6EDFF; --se-blue-50: #F3F6FE;
+  --se-ink: #0B1526; --se-ink-2: #4A5878; --se-ink-3: #8A96B3;
+  --se-line: #DDE4F2; --se-line-2: #E9EEF8; --se-bg: #F7F9FD; --se-card: #FFFFFF;
+  --c-hyp: #6B7A99; --c-adj: #2F63F5; --c-opp: #0B1526;
+  --r-card: 18px; --r-btn: 12px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --math: 'Times New Roman', Times, serif;
+  --ease: cubic-bezier(.22,.8,.22,1);
+  --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100dvh; font-family: var(--font); color: var(--se-ink); background: var(--se-bg); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(to right, rgba(47,99,245,.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+button, a { touch-action: manipulation; }
+.app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; max-width: 640px; margin: 0 auto;
+  padding: calc(14px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal)); }
+@media (min-width: 760px) { .app { padding: calc(24px + var(--sat)) calc(32px + var(--sar)) calc(28px + var(--sab)) calc(32px + var(--sal)); } }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 2px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.retour { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; margin: 6px 0 0 -6px; min-height: 48px; padding: 4px 10px 4px 6px; color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none; border-radius: 8px; transition: color .25s; }
+.retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
+.retour:hover { color: var(--se-blue); } .retour:hover svg { transform: translateX(-3px); }
+.retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+.contexte { margin: 2px 0 10px; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+
+/* =============================================================
+   3. LA CARTE — dessin, avancement et légende, tout à l'intérieur
+   ============================================================= */
+.carte {
+  position: relative; padding: 14px 14px 18px;
+  background: var(--se-card); border: 1px solid var(--se-line); border-radius: var(--r-card);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 8px 22px -14px rgba(11,21,38,.12);
+}
+.entete-carte { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.avance { flex: 1; height: 4px; border-radius: 999px; background: var(--se-blue-100); overflow: hidden; }
+.avance span { display: block; height: 100%; width: 0; background: var(--se-blue); border-radius: 999px; transition: width .5s var(--ease); }
+.compteur { font-size: 12.5px; font-weight: 600; color: var(--se-ink-3); white-space: nowrap; }
+#scene { display: block; width: 100%; height: auto; max-height: 44vh; margin: 0 auto; }
+@media (min-width: 760px) { #scene { max-height: 340px; } }
+
+.cote { fill: none; stroke: var(--se-ink-3); stroke-width: 2.2; stroke-linecap: round;
+  transition: stroke .7s var(--ease), stroke-width .7s var(--ease), opacity .7s var(--ease); }
+.cote.hyp { stroke: var(--c-hyp); stroke-width: 6; }
+.cote.adj { stroke: var(--c-adj); stroke-width: 6; }
+.cote.opp { stroke: var(--c-opp); stroke-width: 6; }
+.cote.touche { stroke: var(--c-adj); stroke-width: 6; animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+.etiq { font-family: var(--font); font-size: 17px; font-weight: 700; letter-spacing: -.01em; opacity: 0; transition: opacity .6s var(--ease), fill .6s var(--ease); dominant-baseline: central; }
+.etiq.hyp { fill: var(--c-hyp); } .etiq.adj { fill: var(--c-adj); } .etiq.opp { fill: var(--c-opp); }
+.etiq.vue { opacity: 1; }
+.sommet { font-family: var(--math); font-style: italic; font-size: 20px; fill: var(--se-ink-2); text-anchor: middle; dominant-baseline: central; }
+.droit { fill: none; stroke: var(--se-ink-2); stroke-width: 1.6; }
+.arc { fill: rgba(47,99,245,.10); stroke: var(--c-adj); stroke-width: 2; opacity: 0; transition: opacity .7s var(--ease); }
+.arc.vue { opacity: 1; }
+.alpha { font-family: var(--math); font-style: italic; font-size: 21px; fill: var(--c-adj); text-anchor: middle; dominant-baseline: central; opacity: 0; transition: opacity .7s var(--ease); }
+.alpha.vue { opacity: 1; }
+.fleche { fill: none; stroke: var(--se-ink-2); stroke-width: 1.6; stroke-linecap: round; opacity: 0; }
+.fleche.vue { opacity: 1; transition: stroke-dashoffset 1.2s var(--ease) .4s, opacity .3s; }
+.fleche-pointe { fill: var(--se-ink-2); opacity: 0; transition: opacity .3s 1.3s; }
+.fleche-pointe.vue { opacity: 1; }
+
+/* La légende a une hauteur réservée : le dessin ne saute pas d'une étape à l'autre */
+.legende { min-height: 118px; margin-top: 6px; padding: 12px 4px 0; border-top: 1px solid var(--se-line-2); text-align: center; }
+.legende__titre { margin: 0 0 6px; font-size: 17px; font-weight: 700; line-height: 1.25; letter-spacing: -.015em; color: var(--se-ink); }
+.legende__texte { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--se-ink-2); }
+.legende b { color: var(--se-ink); font-weight: 600; }
+.legende.entre > * { animation: rise .7s var(--ease) both; }
+.legende.entre > *:nth-child(2) { animation-delay: .15s; }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.m-hyp, .m-adj, .m-opp { font-weight: 700; }
+.m-hyp { color: var(--c-hyp); } .m-adj { color: var(--c-adj); } .m-opp { color: var(--c-opp); }
+.seg { font-family: var(--math); font-style: italic; }
+
+.commandes { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; margin-top: 16px; }
+.commandes .btn { width: 100%; }
+.btn[disabled] { opacity: .4; cursor: default; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 50px; padding: 12px 14px; border: 0; border-radius: var(--r-btn); background: var(--se-blue); color: #fff; font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; transition: background .25s; -webkit-tap-highlight-color: transparent; }
+.btn svg { width: 17px; height: 17px; }
+.btn:hover { background: var(--se-blue-700); }
+.btn:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+.btn--secondaire { background: var(--se-card); color: var(--se-blue); border: 1px solid var(--se-blue-200); }
+.btn--secondaire:hover { background: var(--se-blue-50); }
+
+
+/* Petit écran : le bouton de gauche prend juste sa place, aucun libellé ne se coupe */
+.commandes .btn { white-space: nowrap; }
+@media (max-width: 380px) {
+  .commandes { grid-template-columns: auto 1fr; }
+  .commandes .btn { font-size: 14.5px; padding: 12px 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <div class="top">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true"><rect x="0" y="10" width="5" height="8" rx="1.2" fill="#93B4FD"/><rect x="8.5" y="5" width="5" height="13" rx="1.2" fill="#6091FA"/><rect x="17" y="0" width="5" height="18" rx="1.2" fill="#2F63F5"/></svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+  <a class="retour" href="revision-trigonometrie.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Retour aux révisions
+  </a>
+  <p class="contexte">Trigonométrie · Je révise · Côté adjacent et côté opposé</p>
+
+  <div class="carte">
+    <div class="entete-carte" aria-hidden="true">
+      <div class="avance"><span id="avance"></span></div>
+      <span class="compteur" id="compteur"></span>
+    </div>
+
+    <svg id="scene" viewBox="0 0 380 270" focusable="false" aria-hidden="true">
+      <path class="arc" data-arc="A" d=""/>
+      <path class="arc" data-arc="B" d=""/>
+      <line class="cote" data-cote="AB"/>
+      <line class="cote" data-cote="BC"/>
+      <line class="cote" data-cote="CA"/>
+      <path class="droit" data-droit d=""/>
+      <line class="fleche" data-fleche/>
+      <path class="fleche-pointe" data-pointe d=""/>
+      <text class="etiq" data-etiq="AB"></text>
+      <text class="etiq" data-etiq="BC"></text>
+      <text class="etiq" data-etiq="CA"></text>
+      <text class="alpha" data-alpha="A">α</text>
+      <text class="alpha" data-alpha="B">α</text>
+      <text class="sommet" data-sommet="A">A</text>
+      <text class="sommet" data-sommet="B">B</text>
+      <text class="sommet" data-sommet="C">C</text>
+    </svg>
+
+    <div class="legende" id="legende" aria-live="polite"></div>
+
+    <div class="commandes">
+      <button class="btn btn--secondaire" type="button" id="prec">Précédent</button>
+      <button class="btn" type="button" id="suiv"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   RECONNAÎTRE UN CÔTÉ ADJACENT ET UN CÔTÉ OPPOSÉ
+   Une animation, une étape par clic : même triangle que dans le cours,
+   ABC rectangle en C, hypoténuse [AB], l'angle α d'abord en A.
+   A. Géométrie   B. Les étapes   C. Rendu   D. Navigation
+   ============================================================= */
+(function () {
+'use strict';
+
+/* ------------------------------------------------------------
+   A. GÉOMÉTRIE — sommets donnés autour du centre de rotation,
+   pour pouvoir faire tourner le triangle
+   ------------------------------------------------------------ */
+/* Le triangle tourne autour du MILIEU DE L'HYPOTÉNUSE, centre du cercle qui
+   passe par ses trois sommets : aucun sommet ne s’en éloigne de plus de 100,
+   donc rien ne sort du cadre, à aucun moment de la rotation. */
+const CENTRE = [190, 135];
+const REL = { A: [-84, 54.6], B: [84, -54.6], C: [84, 54.6] };   // C : angle droit
+const COTES = { AB: ['A', 'B'], BC: ['B', 'C'], CA: ['C', 'A'] };
+const rad = d => d * Math.PI / 180;
+const f = n => n.toFixed(2);
+function sommets(rot) {
+  const c = Math.cos(rad(rot)), s = Math.sin(rad(rot)), P = {};
+  for (const k in REL) { const [x, y] = REL[k]; P[k] = [CENTRE[0] + x * c - y * s, CENTRE[1] + x * s + y * c]; }
+  return P;
+}
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1]];
+const add = (a, b) => [a[0] + b[0], a[1] + b[1]];
+const mul = (a, k) => [a[0] * k, a[1] * k];
+const unit = v => mul(v, 1 / Math.hypot(v[0], v[1]));
+const gravite = P => [(P.A[0] + P.B[0] + P.C[0]) / 3, (P.A[1] + P.B[1] + P.C[1]) / 3];
+
+/* Les rôles sont déduits de la géométrie, jamais écrits à la main :
+   hypoténuse = en face de l'angle droit ; adjacent = touche α sans être
+   l'hypoténuse ; opposé = ne touche pas α. */
+function roles(alpha) {
+  const r = { AB: 'hyp' };
+  for (const k of ['BC', 'CA']) r[k] = COTES[k].includes(alpha) ? 'adj' : 'opp';
+  return r;
+}
+const NOM = { hyp: 'hypoténuse', adj: 'adjacent', opp: 'opposé' };
+
+/* ------------------------------------------------------------
+   B. LES ÉTAPES — une idée par étape
+   ------------------------------------------------------------ */
+const S = t => `<span class="seg">${t}</span>`;
+const ETAPES = [
+  { d: 5000, rot: 0, alpha: null, cotes: { AB: 'n', BC: 'n', CA: 'n' }, etiq: [], fleche: null,
+    titre: 'Un triangle rectangle',
+    texte: `Le petit carré marque l’<b>angle droit</b> : il est en <b>C</b>.` },
+  { d: 6500, rot: 0, alpha: null, cotes: { AB: 'hyp', BC: 'n', CA: 'n' }, etiq: ['AB'], fleche: ['C', 'AB'],
+    titre: 'D’abord, l’hypoténuse',
+    texte: `C’est le côté <b>en face de l’angle droit</b>. C’est toujours le plus long.` },
+  { d: 5500, rot: 0, alpha: 'A', cotes: { AB: 'hyp', BC: 'n', CA: 'n' }, etiq: ['AB'], fleche: null,
+    titre: 'Ensuite, on regarde un angle',
+    texte: `Ici, l’angle <b style="color:var(--c-adj)">α</b>, en <b>A</b>.` },
+  { d: 6000, rot: 0, alpha: 'A', cotes: { AB: 'touche', BC: 'n', CA: 'touche' }, etiq: [], fleche: null,
+    titre: 'Deux côtés touchent α',
+    texte: `${S('[AB]')} et ${S('[AC]')} partent du sommet <b>A</b>.` },
+  { d: 7000, rot: 0, alpha: 'A', cotes: { AB: 'hyp', BC: 'n', CA: 'adj' }, etiq: ['AB', 'CA'], fleche: null,
+    titre: 'Le côté adjacent',
+    texte: `${S('[AB]')} est déjà l’hypoténuse. L’autre, ${S('[AC]')}, est le <span class="m-adj">côté adjacent</span> : il est « à côté » de α.` },
+  { d: 7000, rot: 0, alpha: 'A', cotes: { AB: 'hyp', BC: 'opp', CA: 'adj' }, etiq: ['AB', 'CA', 'BC'], fleche: ['A', 'BC'],
+    titre: 'Le côté opposé',
+    texte: `${S('[BC]')} ne touche pas α : il est <b>en face</b>. C’est le <span class="m-opp">côté opposé</span>.` },
+  { d: 6000, rot: 0, alpha: 'A', cotes: { AB: 'hyp', BC: 'opp', CA: 'adj' }, etiq: ['AB', 'CA', 'BC'], fleche: null,
+    titre: 'Les trois côtés',
+    texte: `<span class="m-hyp">Hypoténuse</span>, <span class="m-adj">adjacent</span>, <span class="m-opp">opposé</span> : pour l’angle en A.` },
+  { d: 8000, rot: 0, alpha: 'B', cotes: null, etiq: ['AB', 'CA', 'BC'], fleche: null,
+    titre: 'Si l’angle change, les noms changent',
+    texte: `Avec α en <b>B</b>, l’adjacent et l’opposé s’échangent. L’hypoténuse, elle, ne change jamais.` },
+  { d: 7500, rot: 160, alpha: 'A', cotes: null, etiq: ['AB', 'CA', 'BC'], fleche: null,
+    titre: 'Si le triangle tourne, rien ne change',
+    texte: `On cherche toujours l’<b>angle droit</b>, puis l’<b>angle α</b>.` },
+  { d: 0, rot: 0, alpha: 'A', cotes: null, etiq: ['AB', 'CA', 'BC'], fleche: null, fin: true,
+    titre: 'À retenir',
+    texte: `En face de l’angle droit : l’<span class="m-hyp">hypoténuse</span>. Qui touche α : l’<span class="m-adj">adjacent</span>. En face de α : l’<span class="m-opp">opposé</span>.` },
+];
+
+/* ------------------------------------------------------------
+   C. RENDU
+   ------------------------------------------------------------ */
+const svg = document.getElementById('scene');
+const q = sel => svg.querySelector(sel);
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let rotCourante = 0, anim = null, etape = 0;
+
+/* Tout ce qui dépend de la position, recalculé à chaque image de la rotation */
+function placer(rot, E) {
+  const P = sommets(rot), G = gravite(P);
+  for (const k in COTES) {
+    const [a, b] = COTES[k], l = q(`[data-cote="${k}"]`);
+    l.setAttribute('x1', f(P[a][0])); l.setAttribute('y1', f(P[a][1]));
+    l.setAttribute('x2', f(P[b][0])); l.setAttribute('y2', f(P[b][1]));
+    // étiquette : au milieu du côté, poussée perpendiculairement vers l'extérieur
+    // (à l'opposé du troisième sommet), donc toujours bien centrée sous son trait
+    const m = mul(add(P[a], P[b]), .5), o = ['A', 'B', 'C'].find(x => x !== a && x !== b);
+    const t_ = unit(sub(P[b], P[a])); let dir = [-t_[1], t_[0]];
+    if ((m[0] - P[o][0]) * dir[0] + (m[1] - P[o][1]) * dir[1] < 0) dir = mul(dir, -1);
+    const pos = add(m, mul(dir, 24));
+    const t = q(`[data-etiq="${k}"]`);
+    t.setAttribute('x', f(pos[0])); t.setAttribute('y', f(pos[1]));
+    t.setAttribute('text-anchor', dir[0] > .3 ? 'start' : dir[0] < -.3 ? 'end' : 'middle');
+  }
+  for (const k of ['A', 'B', 'C']) {
+    const p = add(P[k], mul(unit(sub(P[k], G)), 18)), t = q(`[data-sommet="${k}"]`);
+    t.setAttribute('x', f(p[0])); t.setAttribute('y', f(p[1]));
+  }
+  const u = mul(unit(sub(P.A, P.C)), 15), w = mul(unit(sub(P.B, P.C)), 15);
+  const p1 = add(P.C, u), p2 = add(add(P.C, u), w), p3 = add(P.C, w);
+  q('[data-droit]').setAttribute('d', `M${f(p1[0])} ${f(p1[1])} L${f(p2[0])} ${f(p2[1])} L${f(p3[0])} ${f(p3[1])}`);
+  for (const k of ['A', 'B']) {
+    const V = P[k], autres = ['A', 'B', 'C'].filter(x => x !== k);
+    const d1 = unit(sub(P[autres[0]], V)), d2 = unit(sub(P[autres[1]], V)), R = 30;
+    const a1 = add(V, mul(d1, R)), a2 = add(V, mul(d2, R));
+    const croix = d1[0] * d2[1] - d1[1] * d2[0];
+    q(`[data-arc="${k}"]`).setAttribute('d', `M${f(V[0])} ${f(V[1])} L${f(a1[0])} ${f(a1[1])} A${R} ${R} 0 0 ${croix > 0 ? 1 : 0} ${f(a2[0])} ${f(a2[1])} Z`);
+    const pa = add(V, mul(unit(add(d1, d2)), k === 'A' ? 50 : 46));
+    const t = q(`[data-alpha="${k}"]`); t.setAttribute('x', f(pa[0])); t.setAttribute('y', f(pa[1]));
+  }
+  if (E && E.fleche) {
+    const [src, cote] = E.fleche, [a, b] = COTES[cote];
+    const m = mul(add(P[a], P[b]), .5), d = unit(sub(m, P[src]));
+    const debut = add(P[src], mul(d, src === 'C' ? 22 : 64)), fin = add(m, mul(d, -12));
+    const l = q('[data-fleche]');
+    l.setAttribute('x1', f(debut[0])); l.setAttribute('y1', f(debut[1])); l.setAttribute('x2', f(fin[0])); l.setAttribute('y2', f(fin[1]));
+    const n = [-d[1], d[0]], b1 = add(add(fin, mul(d, -9)), mul(n, 5)), b2 = add(add(fin, mul(d, -9)), mul(n, -5));
+    q('[data-pointe]').setAttribute('d', `M${f(fin[0])} ${f(fin[1])} L${f(b1[0])} ${f(b1[1])} L${f(b2[0])} ${f(b2[1])} Z`);
+  }
+}
+
+/* L'état visuel de l'étape : couleurs, noms, arcs, flèche */
+function etat(E) {
+  const r = roles(E.alpha || 'A');
+  const cotes = E.cotes || r;                        // null → les vrais rôles pour l'angle choisi
+  for (const k in COTES) {
+    q(`[data-cote="${k}"]`).setAttribute('class', `cote ${cotes[k] === 'n' ? '' : cotes[k]}`);
+    const t = q(`[data-etiq="${k}"]`), role = r[k];
+    t.textContent = NOM[role];
+    t.setAttribute('class', `etiq ${role} ${E.etiq.includes(k) && cotes[k] !== 'n' && cotes[k] !== 'touche' ? 'vue' : ''}`);
+  }
+  for (const k of ['A', 'B']) {
+    q(`[data-arc="${k}"]`).classList.toggle('vue', E.alpha === k);
+    q(`[data-alpha="${k}"]`).classList.toggle('vue', E.alpha === k);
+  }
+  const fl = q('[data-fleche]'), po = q('[data-pointe]');
+  fl.classList.remove('vue'); po.classList.remove('vue');
+  if (E.fleche) requestAnimationFrame(() => {
+    const L = Math.hypot(fl.x2.baseVal.value - fl.x1.baseVal.value, fl.y2.baseVal.value - fl.y1.baseVal.value);
+    fl.style.transition = 'none'; fl.style.strokeDasharray = L; fl.style.strokeDashoffset = L;
+    void fl.getBoundingClientRect();
+    fl.style.transition = ''; fl.classList.add('vue'); fl.style.strokeDashoffset = 0; po.classList.add('vue');
+  });
+}
+
+/* La rotation se fait en douceur ; tout le reste suit image par image */
+function tourner(vers, E) {
+  if (anim) cancelAnimationFrame(anim);
+  const depuis = rotCourante;
+  if (reduceMotion || depuis === vers) { rotCourante = vers; placer(vers, E); return; }
+  const duree = 2600, t0 = performance.now(), doux = u => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+  const pas = now => {
+    const u = Math.min(1, (now - t0) / duree);
+    rotCourante = depuis + (vers - depuis) * doux(u);
+    placer(rotCourante, E);
+    anim = u < 1 ? requestAnimationFrame(pas) : null;
+  };
+  anim = requestAnimationFrame(pas);
+}
+
+/* ------------------------------------------------------------
+   D. NAVIGATION — l'élève avance à son rythme, un clic par étape
+   ------------------------------------------------------------ */
+const legende = document.getElementById('legende'), barre = document.getElementById('avance'), compteur = document.getElementById('compteur');
+const prec = document.getElementById('prec'), suiv = document.getElementById('suiv');
+const EXERCICE = 'entrainement-trigonometrie-01.html';
+const FLECHE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
+function aller(i) {
+  etape = Math.max(0, Math.min(ETAPES.length - 1, i));
+  const E = ETAPES[etape], derniere = !!E.fin;
+  placer(rotCourante, E); etat(E); tourner(E.rot, E);
+  legende.innerHTML = `<p class="legende__titre">${E.titre}</p><p class="legende__texte">${E.texte}</p>`;
+  legende.classList.remove('entre'); void legende.offsetWidth; legende.classList.add('entre');
+  barre.style.width = ((etape + 1) / ETAPES.length * 100) + '%';
+  compteur.textContent = `${etape + 1} / ${ETAPES.length}`;
+  // première étape : pas de retour possible ; dernière : « Revoir » et « Je m'entraîne »
+  prec.disabled = etape === 0;
+  prec.textContent = derniere ? '↺ Revoir' : 'Précédent';
+  suiv.innerHTML = (derniere ? 'Je m’entraîne ' : 'Suivant ') + FLECHE;
+}
+prec.addEventListener('click', () => ETAPES[etape].fin ? aller(0) : aller(etape - 1));
+suiv.addEventListener('click', () => ETAPES[etape].fin ? (window.location.href = EXERCICE) : aller(etape + 1));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); if (!ETAPES[etape].fin) aller(etape + 1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); aller(etape - 1); }
+});
+/* Glisser le doigt sur le dessin : vers la gauche pour avancer, vers la droite pour reculer */
+let x0 = null, y0 = null;
+svg.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+svg.addEventListener('touchend', e => {
+  if (x0 === null) return;
+  const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) { if (dx < 0 && !ETAPES[etape].fin) aller(etape + 1); if (dx > 0) aller(etape - 1); }
+  x0 = null;
+}, { passive: true });
+
+aller(0);
+
+/* Contrôle interne : les rôles sont bien déduits de la géométrie */
+console.assert(roles('A').CA === 'adj' && roles('A').BC === 'opp', 'rôles en A');
+console.assert(roles('B').BC === 'adj' && roles('B').CA === 'opp', 'rôles en B');
+
+/* Retour : si l'élève vient de la page des révisions, on y revient exactement */
+const lien = document.querySelector('a.retour');
+lien.addEventListener('click', e => {
+  if (window.history.length <= 1) return;
+  e.preventDefault();
+  const garde = setTimeout(() => { window.location.href = lien.href; }, 400);
+  window.addEventListener('pagehide', () => clearTimeout(garde), { once: true });
+  window.history.back();
+});
+})();
+</script>
+</body>
+</html>

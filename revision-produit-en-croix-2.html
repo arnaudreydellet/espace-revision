@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Résoudre un produit en croix — Trigonométrie</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval, mêmes couleurs de côtés que
+   l'animation « côté adjacent et opposé »
+     hypoténuse : gris-bleu · adjacent : bleu · opposé : bleu nuit
+   ============================================================= */
+:root {
+  --se-blue: #2F63F5; --se-blue-700: #244FCC; --se-blue-300: #93B4FD; --se-blue-200: #C6D4FD;
+  --se-blue-100: #E6EDFF; --se-blue-50: #F3F6FE;
+  --se-ink: #0B1526; --se-ink-2: #4A5878; --se-ink-3: #8A96B3;
+  --se-line: #DDE4F2; --se-line-2: #E9EEF8; --se-bg: #F7F9FD; --se-card: #FFFFFF;
+  --c-hyp: #6B7A99; --c-adj: #2F63F5; --c-opp: #0B1526;
+  --r-card: 18px; --r-btn: 12px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --math: 'Times New Roman', Times, serif;
+  --ease: cubic-bezier(.22,.8,.22,1);
+  --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100dvh; font-family: var(--font); color: var(--se-ink); background: var(--se-bg); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(to right, rgba(47,99,245,.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+button, a { touch-action: manipulation; }
+.app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; max-width: 640px; margin: 0 auto;
+  padding: calc(14px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal)); }
+@media (min-width: 760px) { .app { padding: calc(24px + var(--sat)) calc(32px + var(--sar)) calc(28px + var(--sab)) calc(32px + var(--sal)); } }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 2px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.retour { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; margin: 6px 0 0 -6px; min-height: 48px; padding: 4px 10px 4px 6px; color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none; border-radius: 8px; transition: color .25s; }
+.retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
+.retour:hover { color: var(--se-blue); } .retour:hover svg { transform: translateX(-3px); }
+.retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+.contexte { margin: 2px 0 10px; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+
+/* =============================================================
+   3. LA CARTE — tout est à l'intérieur
+   ============================================================= */
+.carte {
+  position: relative; padding: 14px 14px 18px;
+  background: var(--se-card); border: 1px solid var(--se-line); border-radius: var(--r-card);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 8px 22px -14px rgba(11,21,38,.12);
+}
+.entete-carte { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.avance { flex: 1; height: 4px; border-radius: 999px; background: var(--se-blue-100); overflow: hidden; }
+.avance span { display: block; height: 100%; width: 0; background: var(--se-blue); border-radius: 999px; transition: width .5s var(--ease); }
+.compteur { font-size: 12.5px; font-weight: 600; color: var(--se-ink-3); white-space: nowrap; }
+
+/* --- La scène : l'égalité, dont les termes se déplacent « à la main » --- */
+#scene { display: block; width: 100%; height: auto; max-height: 34vh; margin: 6px auto 0; overflow: visible; }
+@media (min-width: 760px) { #scene { max-height: 260px; } }
+.jeton { font-family: var(--math); font-size: 25px; fill: var(--se-ink); text-anchor: middle; dominant-baseline: central;
+  paint-order: stroke; stroke: #fff; stroke-width: 7px; stroke-linejoin: round;
+  transition: transform 1.3s var(--ease), opacity .45s var(--ease), fill .5s; }
+.jeton.cache { opacity: 0; }
+.jeton.fondu { opacity: 0; transition: transform 1.3s var(--ease), opacity .25s; }
+.jeton.inconnue { fill: var(--se-blue); font-weight: 700; }
+.jeton.mot { font-family: var(--font); font-size: 16px; font-weight: 700; }
+.jeton.m-adj { fill: var(--c-adj); } .jeton.m-hyp { fill: var(--c-hyp); }
+.jeton.op { fill: var(--se-ink-2); }
+.jeton.resultat { font-family: var(--font); font-size: 20px; font-weight: 700; fill: var(--se-blue-700); }
+.barre-f { stroke: var(--se-ink); stroke-width: 2; stroke-linecap: round; transition: opacity .5s var(--ease); }
+.barre-f.cache { opacity: 0; }
+.diag { stroke: var(--se-blue); stroke-width: 2.2; stroke-linecap: round; opacity: 0; }
+.diag.vue { opacity: .85; transition: stroke-dashoffset 1s var(--ease), opacity .2s; }
+.diag.part { opacity: 0; transition: opacity .5s; }
+.cadre-res { fill: var(--se-blue-50); stroke: var(--se-blue-300); stroke-width: 1.2; opacity: 0; transition: opacity .6s var(--ease) .3s; }
+.cadre-res.vue { opacity: 1; }
+
+/* --- La légende, hauteur réservée --- */
+.legende { min-height: 104px; margin-top: 10px; padding: 12px 4px 0; border-top: 1px solid var(--se-line-2); text-align: center; }
+.legende__titre { margin: 0 0 6px; font-size: 17px; font-weight: 700; line-height: 1.25; letter-spacing: -.015em; color: var(--se-ink); }
+.legende__texte { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--se-ink-2); }
+.legende b { color: var(--se-ink); font-weight: 600; }
+.legende.entre > * { animation: rise .7s var(--ease) both; }
+.legende.entre > *:nth-child(2) { animation-delay: .15s; }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.seg { font-family: var(--math); font-style: italic; }
+.regle { margin: 8px 0 0; font-size: 15.5px; line-height: 1.7; color: var(--se-ink-2); }
+
+/* --- Les boutons, dans la carte --- */
+.commandes { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; margin-top: 16px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; width: 100%; min-height: 50px; padding: 12px 14px; border: 0; border-radius: var(--r-btn); background: var(--se-blue); color: #fff; font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; transition: background .25s, opacity .25s; -webkit-tap-highlight-color: transparent; }
+.btn svg { width: 17px; height: 17px; }
+.btn:hover { background: var(--se-blue-700); }
+.btn:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+.btn--secondaire { background: var(--se-card); color: var(--se-blue); border: 1px solid var(--se-blue-200); }
+.btn--secondaire:hover { background: var(--se-blue-50); }
+.btn[disabled] { opacity: .4; cursor: default; }
+
+
+/* Petit écran : le bouton de gauche prend juste sa place, aucun libellé ne se coupe */
+.commandes .btn { white-space: nowrap; }
+@media (max-width: 380px) {
+  .commandes { grid-template-columns: auto 1fr; }
+  .commandes .btn { font-size: 14.5px; padding: 12px 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+.m-hyp, .m-adj { font-weight: 700; } .m-hyp { color: var(--c-hyp); } .m-adj { color: var(--c-adj); }
+.inc { color: var(--se-blue); font-weight: 700; font-family: var(--math); }
+</style>
+</head>
+
+<body>
+<div class="app">
+  <div class="top">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true"><rect x="0" y="10" width="5" height="8" rx="1.2" fill="#93B4FD"/><rect x="8.5" y="5" width="5" height="13" rx="1.2" fill="#6091FA"/><rect x="17" y="0" width="5" height="18" rx="1.2" fill="#2F63F5"/></svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+  <a class="retour" href="revision-trigonometrie.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Retour aux révisions
+  </a>
+  <p class="contexte">Trigonométrie · Je révise · Produit en croix</p>
+
+  <div class="carte">
+    <div class="entete-carte" aria-hidden="true">
+      <div class="avance"><span id="avance"></span></div>
+      <span class="compteur" id="compteur"></span>
+    </div>
+
+    <svg id="scene" viewBox="0 0 360 180" focusable="false" aria-hidden="true">
+      <rect class="cadre-res" data-cadre rx="10"/>
+      <line class="diag" data-diag="1"/>
+      <line class="diag" data-diag="2"/>
+      <line class="barre-f" data-barre="G"/>
+      <line class="barre-f" data-barre="D"/>
+      <line class="barre-f" data-barre="R"/>
+      <text class="jeton" data-j="cos"></text>
+      <text class="jeton" data-j="un">1</text>
+      <text class="jeton op" data-j="eg">=</text>
+      <text class="jeton" data-j="haut"></text>
+      <text class="jeton" data-j="bas"></text>
+      <text class="jeton op" data-j="fois">×</text>
+      <text class="jeton resultat" data-j="res"></text>
+    </svg>
+
+    <div class="legende" id="legende" aria-live="polite"></div>
+
+    <div class="commandes">
+      <button class="btn btn--secondaire" type="button" id="prec">Précédent</button>
+      <button class="btn" type="button" id="suiv"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   RÉSOUDRE UN PRODUIT EN CROIX À PARTIR D'UNE FORMULE
+   Rédaction du cours : on écrit la formule, on remplace, on met le
+   nombre de gauche « sur 1 », on relie les diagonales, puis les
+   termes se déplacent comme si on les prenait à la main.
+   cos(30°) reste écrit tel quel jusqu'au bout ; seul le résultat
+   final porte le signe ≈.
+   A. Les états de l'égalité   B. Les étapes   C. Rendu   D. Navigation
+   ============================================================= */
+(function () {
+'use strict';
+
+/* ------------------------------------------------------------
+   A. LES ÉTATS — où se trouve chaque terme (x, y), et ce qu'il affiche
+   Ligne d'égalité à y = 90 ; numérateurs à 66, dénominateurs à 116.
+   ------------------------------------------------------------ */
+const Y = 90, H = 66, B = 116;
+const MASQUE = null;
+const ETATS = {
+  // la formule générale, en mots
+  formule:  { cos: [100, Y, 'cos α'], eg: [168, Y], haut: [252, H, 'adjacent', 'mot m-adj'], bas: [252, B, 'hypoténuse', 'mot m-hyp'],
+              barres: { D: [206, 298] } },
+  // on remplace
+  remplace: { cos: [100, Y, 'cos(30°)'], eg: [172, Y], haut: [250, H, 'AC', 'inconnue'], bas: [250, B, '12'],
+              barres: { D: [215, 285] } },
+  // le nombre de gauche passe « sur 1 »
+  sur1:     { cos: [100, H, 'cos(30°)'], un: [100, B], eg: [178, Y], haut: [252, H, 'AC', 'inconnue'], bas: [252, B, '12'],
+              barres: { G: [52, 148], D: [217, 287] } },
+  croix:    { cos: [100, H, 'cos(30°)'], un: [100, B], eg: [178, Y], haut: [252, H, 'AC', 'inconnue'], bas: [252, B, '12'],
+              barres: { G: [52, 148], D: [217, 287] }, diag: [['cos', 'bas'], ['un', 'haut']] },
+  // AC reste seul ; la diagonale sans AC monte, le 1 qui reste descend
+  seul1:    { haut: [48, Y, 'AC', 'inconnue'], eg: [94, Y], cos: [178, H, 'cos(30°)'], fois: [238, H], bas: [276, H, '12'], un: [226, B],
+              barres: { R: [132, 304] } },
+  div1:     { haut: [48, Y, 'AC', 'inconnue'], eg: [94, Y], cos: [180, Y, 'cos(30°)'], fois: [240, Y], bas: [278, Y, '12'] },
+  res1:     { haut: [48, Y - 22, 'AC', 'inconnue'], eg: [94, Y - 22], cos: [180, Y - 22, 'cos(30°)'], fois: [240, Y - 22], bas: [278, Y - 22, '12'],
+              res: [180, Y + 36, 'AC ≈ 10,39 cm'], cadre: true },
+
+  // le récapitulatif : la formule générale de retour
+  fin:      { cos: [100, Y, 'cos α'], eg: [168, Y], haut: [252, H, 'adjacent', 'mot m-adj'], bas: [252, B, 'hypoténuse', 'mot m-hyp'],
+              barres: { D: [206, 298] } },
+};
+
+/* ------------------------------------------------------------
+   B. LES ÉTAPES
+   ------------------------------------------------------------ */
+const ETAPES = [
+  { etat: 'formule', titre: 'On part de la formule',
+    texte: `Angle α = 30°, hypoténuse ${'<span class="inc" style="color:var(--se-ink)">AB</span>'} = 12 cm. On cherche <span class="inc">AC</span>, le côté adjacent : c’est le <b>cosinus</b>.` },
+  { etat: 'remplace', titre: 'On remplace',
+    texte: `α devient 30°, l’adjacent devient <span class="inc">AC</span>, l’hypoténuse devient 12. On <b>ne calcule pas</b> cos(30°) : on le garde tel quel.` },
+  { etat: 'sur1', titre: 'Un nombre, c’est une fraction sur 1',
+    texte: `cos(30°), c’est cos(30°) <b>sur 1</b>. On a maintenant deux fractions égales.` },
+  { etat: 'croix', titre: 'Le produit en croix',
+    texte: `On relie en diagonale : cos(30°) avec 12, et 1 avec <span class="inc">AC</span>.` },
+  { etat: 'seul1', titre: 'AC reste seul',
+    texte: `D’un côté, <span class="inc">AC</span>. De l’autre : la diagonale sans AC, <b>cos(30°) × 12</b>, divisée par le nombre qui reste, <b>1</b>.` },
+  { etat: 'div1', titre: 'Diviser par 1 ne change rien',
+    texte: `Il reste <span class="inc">AC</span> = cos(30°) × 12.` },
+  { etat: 'res1', titre: 'Le résultat',
+    texte: `À la calculatrice. Le signe <b>≈</b> n’apparaît qu’à la toute fin.` },
+
+
+  { etat: 'fin', fin: true, titre: 'À retenir',
+    texte: `L’inconnue reste <b>seule</b>. On multiplie les deux nombres de <b>la diagonale sans l’inconnue</b>, et on divise par <b>le nombre qui reste</b>.` },
+];
+
+/* ------------------------------------------------------------
+   C. RENDU
+   ------------------------------------------------------------ */
+const svg = document.getElementById('scene');
+const q = sel => svg.querySelector(sel);
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const JETONS = ['cos', 'un', 'eg', 'haut', 'bas', 'fois', 'res'];
+const pos = {};                                           // position courante de chaque jeton
+
+function poserJeton(k, st) {
+  const t = q(`[data-j="${k}"]`);
+  if (!st) { t.classList.add('cache'); return; }
+  const [x, y, texte, cls] = st;
+  pos[k] = [x, y];
+  t.style.transform = `translate(${x}px, ${y}px)`;
+  const nouvelleClasse = `jeton ${k === 'eg' || k === 'fois' ? 'op' : ''} ${k === 'res' ? 'resultat' : ''} ${cls || ''}`.replace(/\s+/g, ' ').trim();
+  if (texte !== undefined && texte !== t.textContent) {
+    // le texte change : on l'efface, on le remplace, on le fait réapparaître
+    t.classList.add('fondu');
+    setTimeout(() => { t.textContent = texte; t.setAttribute('class', nouvelleClasse); }, reduceMotion ? 0 : 260);
+  } else {
+    t.setAttribute('class', nouvelleClasse);
+  }
+}
+function poserBarre(k, seg, dy) {
+  const l = q(`[data-barre="${k}"]`);
+  if (!seg) { l.classList.add('cache'); return; }
+  const y = Y + (dy || 0);
+  l.setAttribute('x1', seg[0]); l.setAttribute('x2', seg[1]); l.setAttribute('y1', y); l.setAttribute('y2', y);
+  l.classList.remove('cache');
+}
+function diagonales(liste) {
+  ['1', '2'].forEach((n, i) => {
+    const l = q(`[data-diag="${n}"]`);
+    l.classList.remove('vue'); l.classList.add('part');
+    if (!liste || !liste[i]) return;
+    const [a, b] = liste[i], pa = pos[a], pb = pos[b];
+    // la diagonale s'arrête un peu avant chaque terme, pour ne jamais les toucher
+    const dx = pb[0] - pa[0], dy = pb[1] - pa[1], L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L;
+    const m1 = a === 'cos' ? 46 : 16, m2 = b === 'bas' || b === 'haut' ? 22 : 16;
+    const x1 = pa[0] + ux * m1, y1 = pa[1] + uy * m1, x2 = pb[0] - ux * m2, y2 = pb[1] - uy * m2;
+    l.setAttribute('x1', x1); l.setAttribute('y1', y1); l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+    const len = Math.hypot(x2 - x1, y2 - y1);
+    l.classList.remove('part');
+    l.style.transition = 'none'; l.style.strokeDasharray = len; l.style.strokeDashoffset = len;
+    void l.getBoundingClientRect();
+    l.style.transition = ''; l.style.transitionDelay = (i * .5 + .2) + 's';
+    l.classList.add('vue'); l.style.strokeDashoffset = 0;
+  });
+}
+function etat(nom) {
+  const E = ETATS[nom];
+  for (const k of JETONS) poserJeton(k, E[k] || MASQUE);
+  const b = E.barres || {}, dy = b._dy || 0;
+  poserBarre('G', b.G); poserBarre('D', b.D); poserBarre('R', b.R, dy);
+  diagonales(E.diag);
+  const c = q('[data-cadre]');
+  if (E.cadre && E.res) {
+    const [x, y] = E.res; c.setAttribute('x', x - 92); c.setAttribute('y', y - 20); c.setAttribute('width', 184); c.setAttribute('height', 40);
+  }
+  c.classList.toggle('vue', !!E.cadre);
+}
+
+/* ------------------------------------------------------------
+   D. NAVIGATION — un clic par étape
+   ------------------------------------------------------------ */
+const legende = document.getElementById('legende'), barre = document.getElementById('avance'), compteur = document.getElementById('compteur');
+const prec = document.getElementById('prec'), suiv = document.getElementById('suiv');
+const EXERCICE = 'entrainement-trigonometrie-02.html';         // l'exercice « Calculer une longueur »
+const FLECHE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+let etape = 0;
+
+function aller(i) {
+  etape = Math.max(0, Math.min(ETAPES.length - 1, i));
+  const E = ETAPES[etape], derniere = !!E.fin;
+  etat(E.etat);
+  legende.innerHTML = `<p class="legende__titre">${E.titre}</p><p class="legende__texte">${E.texte}</p>`;
+  legende.classList.remove('entre'); void legende.offsetWidth; legende.classList.add('entre');
+  barre.style.width = ((etape + 1) / ETAPES.length * 100) + '%';
+  compteur.textContent = `${etape + 1} / ${ETAPES.length}`;
+  prec.disabled = etape === 0;
+  prec.textContent = derniere ? '↺ Revoir' : 'Précédent';
+  suiv.innerHTML = (derniere ? 'Je m’entraîne ' : 'Suivant ') + FLECHE;
+}
+prec.addEventListener('click', () => ETAPES[etape].fin ? aller(0) : aller(etape - 1));
+suiv.addEventListener('click', () => ETAPES[etape].fin ? (window.location.href = EXERCICE) : aller(etape + 1));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); if (!ETAPES[etape].fin) aller(etape + 1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); aller(etape - 1); }
+});
+let x0 = null, y0 = null;
+svg.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+svg.addEventListener('touchend', e => {
+  if (x0 === null) return;
+  const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) { if (dx < 0 && !ETAPES[etape].fin) aller(etape + 1); if (dx > 0) aller(etape - 1); }
+  x0 = null;
+}, { passive: true });
+
+aller(0);
+
+/* Contrôle interne : les résultats affichés sont les bons */
+console.assert(Math.abs(12 * Math.cos(Math.PI / 6) - 10.39) < .005, 'AC ≈ 10,39');
+console.assert(Math.abs(6 / Math.cos(Math.PI / 6) - 6.93) < .005, 'AB ≈ 6,93');
+
+/* Retour : si l'élève vient de la page des révisions, on y revient exactement */
+const lien = document.querySelector('a.retour');
+lien.addEventListener('click', e => {
+  if (window.history.length <= 1) return;
+  e.preventDefault();
+  const garde = setTimeout(() => { window.location.href = lien.href; }, 400);
+  window.addEventListener('pagehide', () => clearTimeout(garde), { once: true });
+  window.history.back();
+});
+})();
+</script>
+</body>
+</html>

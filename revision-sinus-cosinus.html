@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Choisir sinus ou cosinus — Trigonométrie</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval, mêmes couleurs de côtés que
+   l'animation « côté adjacent et opposé »
+     hypoténuse : gris-bleu · adjacent : bleu · opposé : bleu nuit
+   ============================================================= */
+:root {
+  --se-blue: #2F63F5; --se-blue-700: #244FCC; --se-blue-300: #93B4FD; --se-blue-200: #C6D4FD;
+  --se-blue-100: #E6EDFF; --se-blue-50: #F3F6FE;
+  --se-ink: #0B1526; --se-ink-2: #4A5878; --se-ink-3: #8A96B3;
+  --se-line: #DDE4F2; --se-line-2: #E9EEF8; --se-bg: #F7F9FD; --se-card: #FFFFFF;
+  --c-hyp: #6B7A99; --c-adj: #2F63F5; --c-opp: #0B1526;
+  --r-card: 18px; --r-btn: 12px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --math: 'Times New Roman', Times, serif;
+  --ease: cubic-bezier(.22,.8,.22,1);
+  --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100dvh; font-family: var(--font); color: var(--se-ink); background: var(--se-bg); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(to right, rgba(47,99,245,.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+button, a { touch-action: manipulation; }
+.app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; max-width: 640px; margin: 0 auto;
+  padding: calc(14px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal)); }
+@media (min-width: 760px) { .app { padding: calc(24px + var(--sat)) calc(32px + var(--sar)) calc(28px + var(--sab)) calc(32px + var(--sal)); } }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 2px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.retour { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; margin: 6px 0 0 -6px; min-height: 48px; padding: 4px 10px 4px 6px; color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none; border-radius: 8px; transition: color .25s; }
+.retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
+.retour:hover { color: var(--se-blue); } .retour:hover svg { transform: translateX(-3px); }
+.retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+.contexte { margin: 2px 0 10px; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+
+/* =============================================================
+   3. LA CARTE — tout est à l'intérieur
+   ============================================================= */
+.carte {
+  position: relative; padding: 14px 14px 18px;
+  background: var(--se-card); border: 1px solid var(--se-line); border-radius: var(--r-card);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 8px 22px -14px rgba(11,21,38,.12);
+}
+.entete-carte { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.avance { flex: 1; height: 4px; border-radius: 999px; background: var(--se-blue-100); overflow: hidden; }
+.avance span { display: block; height: 100%; width: 0; background: var(--se-blue); border-radius: 999px; transition: width .5s var(--ease); }
+.compteur { font-size: 12.5px; font-weight: 600; color: var(--se-ink-3); white-space: nowrap; }
+
+/* --- Le triangle --- */
+#scene { display: block; width: 100%; height: auto; max-height: 34vh; margin: 0 auto; }
+@media (min-width: 760px) { #scene { max-height: 280px; } }
+.cote { fill: none; stroke: var(--se-ink-3); stroke-width: 2.2; stroke-linecap: round;
+  transition: stroke .7s var(--ease), stroke-width .7s var(--ease), opacity .7s var(--ease); }
+.cote.hyp { stroke: var(--c-hyp); stroke-width: 6; }
+.cote.adj { stroke: var(--c-adj); stroke-width: 6; }
+.cote.opp { stroke: var(--c-opp); stroke-width: 6; }
+.cote.pale { stroke: var(--se-line); stroke-width: 2.2; }
+.etiq { font-family: var(--font); font-size: 17px; font-weight: 700; letter-spacing: -.01em; opacity: 0; transition: opacity .6s var(--ease); dominant-baseline: central; }
+.etiq.hyp { fill: var(--c-hyp); } .etiq.adj { fill: var(--c-adj); } .etiq.opp { fill: var(--c-opp); }
+.etiq.vue { opacity: 1; }
+.pastille { opacity: 0; transition: opacity .6s var(--ease); }
+.pastille.vue { opacity: 1; }
+.pastille rect { fill: var(--se-card); stroke: var(--se-line); stroke-width: 1; }
+.pastille.inconnue rect { fill: var(--se-blue-50); stroke: var(--se-blue-300); }
+.mesure { font-family: var(--font); font-size: 15px; font-weight: 700; fill: var(--se-ink); text-anchor: middle; dominant-baseline: central; }
+.pastille.inconnue .mesure { font-size: 19px; fill: var(--se-blue); }
+.sommet { font-family: var(--math); font-style: italic; font-size: 20px; fill: var(--se-ink-2); text-anchor: middle; dominant-baseline: central; }
+.droit { fill: none; stroke: var(--se-ink-2); stroke-width: 1.6; }
+.arc { fill: rgba(47,99,245,.10); stroke: var(--c-adj); stroke-width: 2; }
+.alpha { font-family: var(--math); font-style: italic; font-size: 21px; fill: var(--c-adj); text-anchor: middle; dominant-baseline: central; }
+
+/* --- Les deux formules : c'est elles qu'on choisit --- */
+.formules { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+.formule {
+  padding: 10px 6px 8px; border-radius: 12px; border: 1.5px solid var(--se-line); background: var(--se-card); text-align: center;
+  transition: opacity .6s var(--ease), transform .6s var(--ease), border-color .5s var(--ease), background .5s var(--ease), box-shadow .5s var(--ease);
+}
+.formule__nom { display: block; margin-bottom: 4px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--se-ink-3); transition: color .5s; }
+.formule__math { display: inline-flex; align-items: center; gap: 6px; font-family: var(--math); font-size: 18px; color: var(--se-ink); }
+.formule__g { white-space: nowrap; }
+.frac { display: inline-flex; flex-direction: column; align-items: stretch; text-align: center; }
+.frac > .num { border-bottom: 1.8px solid currentColor; padding: 0 3px 2px; }
+.frac > .den { padding: 2px 3px 0; }
+.frac .mot { font-family: var(--font); font-size: 12.5px; font-weight: 700; transition: background .5s, box-shadow .5s; border-radius: 4px; }
+.formule.choisie { border-color: var(--se-blue); background: var(--se-blue-50); box-shadow: 0 0 0 3px var(--se-blue-100); }
+.formule.choisie .formule__nom { color: var(--se-blue-700); }
+.formule.effacee { opacity: .22; transform: scale(.96); }
+.formules.commun .mot.m-hyp { background: rgba(107,122,153,.14); box-shadow: 0 0 0 3px rgba(107,122,153,.14); }
+.m-hyp, .m-adj, .m-opp { font-weight: 700; }
+.m-hyp { color: var(--c-hyp); } .m-adj { color: var(--c-adj); } .m-opp { color: var(--c-opp); }
+@media (max-width: 380px) { .formules { gap: 6px; } .formule { padding: 9px 4px 7px; } .formule__math { font-size: 14.5px; gap: 3px; } .frac .mot { font-size: 10.5px; } .frac > .num, .frac > .den { padding-left: 1px; padding-right: 1px; } }
+
+/* --- La légende, hauteur réservée --- */
+.legende { min-height: 104px; margin-top: 10px; padding: 12px 4px 0; border-top: 1px solid var(--se-line-2); text-align: center; }
+.legende__titre { margin: 0 0 6px; font-size: 17px; font-weight: 700; line-height: 1.25; letter-spacing: -.015em; color: var(--se-ink); }
+.legende__texte { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--se-ink-2); }
+.legende b { color: var(--se-ink); font-weight: 600; }
+.legende.entre > * { animation: rise .7s var(--ease) both; }
+.legende.entre > *:nth-child(2) { animation-delay: .15s; }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.seg { font-family: var(--math); font-style: italic; }
+.regle { margin: 8px 0 0; font-size: 15.5px; line-height: 1.7; color: var(--se-ink-2); }
+
+/* --- Les boutons, dans la carte --- */
+.commandes { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; margin-top: 16px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; width: 100%; min-height: 50px; padding: 12px 14px; border: 0; border-radius: var(--r-btn); background: var(--se-blue); color: #fff; font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; transition: background .25s, opacity .25s; -webkit-tap-highlight-color: transparent; }
+.btn svg { width: 17px; height: 17px; }
+.btn:hover { background: var(--se-blue-700); }
+.btn:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+.btn--secondaire { background: var(--se-card); color: var(--se-blue); border: 1px solid var(--se-blue-200); }
+.btn--secondaire:hover { background: var(--se-blue-50); }
+.btn[disabled] { opacity: .4; cursor: default; }
+
+
+/* Petit écran : le bouton de gauche prend juste sa place, aucun libellé ne se coupe */
+.commandes .btn { white-space: nowrap; }
+@media (max-width: 380px) {
+  .commandes { grid-template-columns: auto 1fr; }
+  .commandes .btn { font-size: 14.5px; padding: 12px 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <div class="top">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true"><rect x="0" y="10" width="5" height="8" rx="1.2" fill="#93B4FD"/><rect x="8.5" y="5" width="5" height="13" rx="1.2" fill="#6091FA"/><rect x="17" y="0" width="5" height="18" rx="1.2" fill="#2F63F5"/></svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+  <a class="retour" href="revision-trigonometrie.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Retour aux révisions
+  </a>
+  <p class="contexte">Trigonométrie · Je révise · Choisir sinus ou cosinus</p>
+
+  <div class="carte">
+    <div class="entete-carte" aria-hidden="true">
+      <div class="avance"><span id="avance"></span></div>
+      <span class="compteur" id="compteur"></span>
+    </div>
+
+    <svg id="scene" viewBox="0 0 380 222" focusable="false" aria-hidden="true">
+      <path class="arc" data-arc d=""/>
+      <line class="cote" data-cote="AB"/>
+      <line class="cote" data-cote="BC"/>
+      <line class="cote" data-cote="CA"/>
+      <path class="droit" data-droit d=""/>
+      <text class="etiq" data-etiq="AB"></text>
+      <text class="etiq" data-etiq="BC"></text>
+      <text class="etiq" data-etiq="CA"></text>
+      <g class="pastille" data-pastille="AB"><rect rx="7"/><text class="mesure" data-mesure="AB"></text></g>
+      <g class="pastille" data-pastille="BC"><rect rx="7"/><text class="mesure" data-mesure="BC"></text></g>
+      <g class="pastille" data-pastille="CA"><rect rx="7"/><text class="mesure" data-mesure="CA"></text></g>
+      <text class="alpha" data-alpha>α</text>
+      <text class="sommet" data-sommet="A">A</text>
+      <text class="sommet" data-sommet="B">B</text>
+      <text class="sommet" data-sommet="C">C</text>
+    </svg>
+
+    <div class="formules" id="formules">
+      <div class="formule" data-f="cos">
+        <span class="formule__nom">Cosinus</span>
+        <span class="formule__math"><span class="formule__g">cos α =</span>
+          <span class="frac"><span class="num mot m-adj">adjacent</span><span class="den mot m-hyp">hypoténuse</span></span>
+        </span>
+      </div>
+      <div class="formule" data-f="sin">
+        <span class="formule__nom">Sinus</span>
+        <span class="formule__math"><span class="formule__g">sin α =</span>
+          <span class="frac"><span class="num mot m-opp">opposé</span><span class="den mot m-hyp">hypoténuse</span></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="legende" id="legende" aria-live="polite"></div>
+
+    <div class="commandes">
+      <button class="btn btn--secondaire" type="button" id="prec">Précédent</button>
+      <button class="btn" type="button" id="suiv"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   CHOISIR SINUS OU COSINUS — sans aucun calcul
+   Même triangle que dans le cours : ABC rectangle en C, angle α en A.
+   On repère les deux côtés en jeu (le connu, le cherché), et c'est
+   eux qui désignent la formule.
+   A. Géométrie   B. Les étapes   C. Rendu   D. Navigation
+   ============================================================= */
+(function () {
+'use strict';
+
+/* ------------------------------------------------------------
+   A. GÉOMÉTRIE
+   ------------------------------------------------------------ */
+const P = { A: [106, 172], B: [274, 62], C: [274, 172] };       // C : angle droit, α en A
+const COTES = { AB: ['A', 'B'], BC: ['B', 'C'], CA: ['C', 'A'] };
+const ROLE = { AB: 'hyp', CA: 'adj', BC: 'opp' };                  // pour l'angle en A
+const NOM = { hyp: 'hypoténuse', adj: 'adjacent', opp: 'opposé' };
+const f = n => n.toFixed(2);
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1]];
+const add = (a, b) => [a[0] + b[0], a[1] + b[1]];
+const mul = (a, k) => [a[0] * k, a[1] * k];
+const unit = v => mul(v, 1 / Math.hypot(v[0], v[1]));
+
+/* La formule se déduit des deux côtés en jeu, jamais écrite à la main */
+function formulePour(c1, c2) {
+  const r = [ROLE[c1], ROLE[c2]];
+  if (r.includes('hyp') && r.includes('adj')) return 'cos';
+  if (r.includes('hyp') && r.includes('opp')) return 'sin';
+  return null;
+}
+
+/* ------------------------------------------------------------
+   B. LES ÉTAPES
+   cotes   : état de chaque côté (rôle, 'n' neutre, 'pale' mis de côté)
+   etiq    : côtés dont le nom est affiché
+   mesures : ce qu'on écrit sur les côtés (longueur connue, ou « ? »)
+   formules: 'n' neutre, 'choisie', 'effacee'
+   ------------------------------------------------------------ */
+const S = t => `<span class="seg">${t}</span>`;
+const TOUS = { AB: 'hyp', BC: 'opp', CA: 'adj' };
+const NEUTRE = { AB: 'n', BC: 'n', CA: 'n' };
+const ETAPES = [
+  { cotes: TOUS, etiq: ['AB', 'BC', 'CA'], mesures: {}, formules: { cos: 'n', sin: 'n' },
+    titre: 'Deux formules à choisir',
+    texte: `Le <b>cosinus</b> et le <b>sinus</b> relient l’angle α à deux côtés du triangle.` },
+  { cotes: { AB: 'hyp', BC: 'pale', CA: 'adj' }, etiq: ['AB', 'CA'], mesures: {}, formules: { cos: 'choisie', sin: 'effacee' },
+    titre: 'Le cosinus',
+    texte: `Il utilise le côté <span class="m-adj">adjacent</span> et l’<span class="m-hyp">hypoténuse</span>.` },
+  { cotes: { AB: 'hyp', BC: 'opp', CA: 'pale' }, etiq: ['AB', 'BC'], mesures: {}, formules: { cos: 'effacee', sin: 'choisie' },
+    titre: 'Le sinus',
+    texte: `Il utilise le côté <span class="m-opp">opposé</span> et l’<span class="m-hyp">hypoténuse</span>.` },
+  { cotes: TOUS, etiq: ['AB', 'BC', 'CA'], mesures: {}, formules: { cos: 'n', sin: 'n' }, commun: true,
+    titre: 'Ce qui les distingue',
+    texte: `Les deux utilisent l’<span class="m-hyp">hypoténuse</span>. La différence : <span class="m-adj">adjacent</span> ou <span class="m-opp">opposé</span>.` },
+
+  { cotes: NEUTRE, etiq: [], mesures: { AB: '12 cm', CA: '?' }, formules: { cos: 'n', sin: 'n' },
+    titre: 'Situation 1',
+    texte: `On connaît ${S('AB')} = 12 cm. On cherche ${S('AC')}. Quelle formule ?` },
+  { cotes: { AB: 'hyp', BC: 'pale', CA: 'adj' }, etiq: ['AB', 'CA'], mesures: { AB: '12 cm', CA: '?' }, formules: { cos: 'n', sin: 'n' },
+    titre: 'Quels côtés sont en jeu ?',
+    texte: `${S('[AB]')} est l’<span class="m-hyp">hypoténuse</span>, ${S('[AC]')} est le côté <span class="m-adj">adjacent</span>.` },
+  { cotes: { AB: 'hyp', BC: 'pale', CA: 'adj' }, etiq: ['AB', 'CA'], mesures: { AB: '12 cm', CA: '?' }, jeu: ['AB', 'CA'],
+    titre: 'On choisit le cosinus',
+    texte: `<span class="m-adj">Adjacent</span> et <span class="m-hyp">hypoténuse</span> : c’est le <b>cosinus</b>.` },
+
+  { cotes: NEUTRE, etiq: [], mesures: { AB: '12 cm', BC: '?' }, formules: { cos: 'n', sin: 'n' },
+    titre: 'Situation 2',
+    texte: `On connaît toujours ${S('AB')} = 12 cm. On cherche maintenant ${S('BC')}.` },
+  { cotes: { AB: 'hyp', BC: 'opp', CA: 'pale' }, etiq: ['AB', 'BC'], mesures: { AB: '12 cm', BC: '?' }, jeu: ['AB', 'BC'],
+    titre: 'On choisit le sinus',
+    texte: `${S('[BC]')} est <b>en face</b> de α : il est <span class="m-opp">opposé</span>. Opposé et hypoténuse : c’est le <b>sinus</b>.` },
+
+  { cotes: NEUTRE, etiq: [], mesures: { CA: '8 cm', AB: '?' }, formules: { cos: 'n', sin: 'n' },
+    titre: 'Situation 3 : à toi !',
+    texte: `On connaît ${S('AC')} = 8 cm. On cherche ${S('AB')}. Cosinus ou sinus ?` },
+  { cotes: { AB: 'hyp', BC: 'pale', CA: 'adj' }, etiq: ['AB', 'CA'], mesures: { CA: '8 cm', AB: '?' }, jeu: ['AB', 'CA'],
+    titre: 'C’est le cosinus',
+    texte: `${S('[AC]')} est adjacent, ${S('[AB]')} est l’hypoténuse. Connu ou cherché, peu importe : ce sont <b>les deux côtés en jeu</b> qui décident.` },
+
+  { cotes: TOUS, etiq: ['AB', 'BC', 'CA'], mesures: {}, formules: { cos: 'n', sin: 'n' }, fin: true,
+    titre: 'À retenir',
+    texte: `Je repère le côté <b>connu</b> et le côté <b>cherché</b>.</p><p class="regle"><span class="m-adj">Adjacent</span> + <span class="m-hyp">hypoténuse</span> → <b>cosinus</b><br><span class="m-opp">Opposé</span> + <span class="m-hyp">hypoténuse</span> → <b>sinus</b>` },
+];
+
+/* ------------------------------------------------------------
+   C. RENDU — la figure est posée une fois ; seuls les états changent
+   ------------------------------------------------------------ */
+const svg = document.getElementById('scene');
+const q = sel => svg.querySelector(sel);
+const formules = document.getElementById('formules');
+
+(function poser() {
+  for (const k in COTES) {
+    const [a, b] = COTES[k], o = ['A', 'B', 'C'].find(x => x !== a && x !== b);
+    const l = q(`[data-cote="${k}"]`);
+    l.setAttribute('x1', P[a][0]); l.setAttribute('y1', P[a][1]); l.setAttribute('x2', P[b][0]); l.setAttribute('y2', P[b][1]);
+    // normale au côté, tournée vers l'extérieur (à l'opposé du troisième sommet)
+    const m = mul(add(P[a], P[b]), .5), t = unit(sub(P[b], P[a]));
+    let n = [-t[1], t[0]];
+    if ((m[0] - P[o][0]) * n[0] + (m[1] - P[o][1]) * n[1] < 0) n = mul(n, -1);
+    const ancre = v => v[0] > .3 ? 'start' : v[0] < -.3 ? 'end' : 'middle';
+    // le nom du côté à l'extérieur, la mesure à l'intérieur
+    const e = q(`[data-etiq="${k}"]`), pe = add(m, mul(n, 24));
+    e.setAttribute('x', f(pe[0])); e.setAttribute('y', f(pe[1])); e.setAttribute('text-anchor', ancre(n));
+    const me = q(`[data-mesure="${k}"]`);
+    me.setAttribute('x', f(m[0])); me.setAttribute('y', f(m[1]));
+  }
+  const G = [(P.A[0] + P.B[0] + P.C[0]) / 3, (P.A[1] + P.B[1] + P.C[1]) / 3];
+  for (const k of ['A', 'B', 'C']) {
+    const p = add(P[k], mul(unit(sub(P[k], G)), 18)), t = q(`[data-sommet="${k}"]`);
+    t.setAttribute('x', f(p[0])); t.setAttribute('y', f(p[1]));
+  }
+  const u = mul(unit(sub(P.A, P.C)), 15), w = mul(unit(sub(P.B, P.C)), 15);
+  const p1 = add(P.C, u), p2 = add(add(P.C, u), w), p3 = add(P.C, w);
+  q('[data-droit]').setAttribute('d', `M${f(p1[0])} ${f(p1[1])} L${f(p2[0])} ${f(p2[1])} L${f(p3[0])} ${f(p3[1])}`);
+  const d1 = unit(sub(P.B, P.A)), d2 = unit(sub(P.C, P.A)), R = 30;
+  const a1 = add(P.A, mul(d1, R)), a2 = add(P.A, mul(d2, R));
+  q('[data-arc]').setAttribute('d', `M${P.A[0]} ${P.A[1]} L${f(a1[0])} ${f(a1[1])} A${R} ${R} 0 0 1 ${f(a2[0])} ${f(a2[1])} Z`);
+  const pa = add(P.A, mul(unit(add(d1, d2)), 50));
+  q('[data-alpha]').setAttribute('x', f(pa[0])); q('[data-alpha]').setAttribute('y', f(pa[1]));
+})();
+
+function etat(E) {
+  for (const k in COTES) {
+    const s = E.cotes[k];
+    q(`[data-cote="${k}"]`).setAttribute('class', `cote ${s === 'n' ? '' : s}`);
+    const e = q(`[data-etiq="${k}"]`);
+    e.textContent = NOM[ROLE[k]];
+    e.setAttribute('class', `etiq ${ROLE[k]} ${E.etiq.includes(k) ? 'vue' : ''}`);
+    const g = q(`[data-pastille="${k}"]`), m = g.querySelector('text'), v = E.mesures[k];
+    if (v) {
+      m.textContent = v;
+      g.setAttribute('class', `pastille ${v === '?' ? 'inconnue' : ''}`);   // taille finale avant mesure
+      const b = m.getBBox(), px = v === '?' ? 9 : 7, py = 3, r = g.querySelector('rect');
+      r.setAttribute('x', f(b.x - px)); r.setAttribute('y', f(b.y - py));
+      r.setAttribute('width', f(b.width + 2 * px)); r.setAttribute('height', f(b.height + 2 * py));
+    }
+    g.setAttribute('class', `pastille ${v === '?' ? 'inconnue' : ''} ${v ? 'vue' : ''}`);
+  }
+  // la formule choisie est déduite des côtés en jeu, pas écrite dans l'étape
+  let fo = E.formules;
+  if (E.jeu) { const c = formulePour(...E.jeu); fo = { cos: c === 'cos' ? 'choisie' : 'effacee', sin: c === 'sin' ? 'choisie' : 'effacee' }; }
+  for (const k of ['cos', 'sin']) {
+    const el = formules.querySelector(`[data-f="${k}"]`);
+    el.classList.toggle('choisie', fo[k] === 'choisie');
+    el.classList.toggle('effacee', fo[k] === 'effacee');
+  }
+  formules.classList.toggle('commun', !!E.commun);
+}
+
+/* ------------------------------------------------------------
+   D. NAVIGATION — l'élève avance à son rythme, un clic par étape
+   ------------------------------------------------------------ */
+const legende = document.getElementById('legende'), barre = document.getElementById('avance'), compteur = document.getElementById('compteur');
+const prec = document.getElementById('prec'), suiv = document.getElementById('suiv');
+const EXERCICE = 'entrainement-trigonometrie-03.html';           // l'exercice « Sinus ou cosinus ? »
+const FLECHE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+let etape = 0;
+
+function aller(i) {
+  etape = Math.max(0, Math.min(ETAPES.length - 1, i));
+  const E = ETAPES[etape], derniere = !!E.fin;
+  etat(E);
+  legende.innerHTML = `<p class="legende__titre">${E.titre}</p><p class="legende__texte">${E.texte}</p>`;
+  legende.classList.remove('entre'); void legende.offsetWidth; legende.classList.add('entre');
+  barre.style.width = ((etape + 1) / ETAPES.length * 100) + '%';
+  compteur.textContent = `${etape + 1} / ${ETAPES.length}`;
+  prec.disabled = etape === 0;
+  prec.textContent = derniere ? '↺ Revoir' : 'Précédent';
+  suiv.innerHTML = (derniere ? 'Je m’entraîne ' : 'Suivant ') + FLECHE;
+}
+prec.addEventListener('click', () => ETAPES[etape].fin ? aller(0) : aller(etape - 1));
+suiv.addEventListener('click', () => ETAPES[etape].fin ? (window.location.href = EXERCICE) : aller(etape + 1));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); if (!ETAPES[etape].fin) aller(etape + 1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); aller(etape - 1); }
+});
+let x0 = null, y0 = null;
+svg.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+svg.addEventListener('touchend', e => {
+  if (x0 === null) return;
+  const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) { if (dx < 0 && !ETAPES[etape].fin) aller(etape + 1); if (dx > 0) aller(etape - 1); }
+  x0 = null;
+}, { passive: true });
+
+aller(0);
+
+/* Contrôle interne : la formule découle bien des côtés en jeu */
+console.assert(formulePour('AB', 'CA') === 'cos', 'hyp + adj → cos');
+console.assert(formulePour('AB', 'BC') === 'sin', 'hyp + opp → sin');
+
+/* Retour : si l'élève vient de la page des révisions, on y revient exactement */
+const lien = document.querySelector('a.retour');
+lien.addEventListener('click', e => {
+  if (window.history.length <= 1) return;
+  e.preventDefault();
+  const garde = setTimeout(() => { window.location.href = lien.href; }, 400);
+  window.addEventListener('pagehide', () => clearTimeout(garde), { once: true });
+  window.history.back();
+});
+})();
+</script>
+</body>
+</html>

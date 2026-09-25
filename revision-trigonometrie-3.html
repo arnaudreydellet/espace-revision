@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Je révise le cours — Trigonométrie</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval (identiques aux autres pages)
+   ============================================================= */
+:root {
+  --se-blue: #2F63F5; --se-blue-700: #244FCC; --se-blue-300: #93B4FD; --se-blue-200: #C6D4FD;
+  --se-blue-100: #E6EDFF; --se-blue-50: #F3F6FE;
+  --se-ink: #0B1526; --se-ink-2: #4A5878; --se-ink-3: #8A96B3;
+  --se-line: #DDE4F2; --se-line-2: #E9EEF8; --se-bg: #F7F9FD; --se-card: #FFFFFF;
+  --se-ok: #1B9E5A; --se-ok-100: #DFF5E8;
+  --r-card: 16px; --r-btn: 12px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --math: 'Times New Roman', Times, serif;
+  --ease: cubic-bezier(.22,.8,.22,1);
+  --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100dvh; font-family: var(--font); color: var(--se-ink); background: var(--se-bg); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(to right, rgba(47,99,245,.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+.app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; max-width: 900px; margin: 0 auto;
+  padding: calc(16px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal)); }
+@media (min-width: 760px) { .app { padding: calc(26px + var(--sat)) calc(32px + var(--sar)) calc(24px + var(--sab)) calc(32px + var(--sal)); } }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 32px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 2px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.retour { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; margin-top: 16px; margin-left: -6px; min-height: 48px; padding: 4px 10px 4px 6px; color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none; border-radius: 8px; transition: color .25s; }
+.retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
+.retour:hover { color: var(--se-blue); } .retour:hover svg { transform: translateX(-3px); }
+.retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+
+.hero { padding: 6px 0 20px; }
+@media (min-width: 760px) { .hero { padding: 10px 0 26px; } }
+.hero__context { margin: 0 0 8px; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+.hero h1 { margin: 0 0 8px; font-size: clamp(28px, 6.6vw, 42px); font-weight: 700; line-height: 1.05; letter-spacing: -.028em; }
+.hero__sub { margin: 0; font-size: clamp(15px, 2vw, 17px); line-height: 1.5; color: var(--se-ink-2); }
+
+/* =============================================================
+   3. LA LISTE DES EXERCICES — un seul gabarit de carte
+   ============================================================= */
+.grille { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 620px) { .grille { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
+
+.exo {
+  position: relative; display: flex; gap: 14px; align-items: stretch;
+  background: var(--se-card); border: 1px solid var(--se-line); border-radius: var(--r-card);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 6px 18px -10px rgba(11,21,38,.10);
+  text-decoration: none; color: inherit; overflow: hidden; padding: 14px;
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease), border-color .3s;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.exo:hover, .exo:focus-visible {
+  transform: translateY(-2px); border-color: var(--se-blue-200);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 14px 28px -14px rgba(47,99,245,.22);
+}
+.exo:active { transform: translateY(0) scale(.995); transition-duration: .12s; }
+.exo:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+
+.motif { position: relative; flex: 0 0 76px; width: 76px; min-height: 76px; border-radius: 12px; background: var(--se-blue-50); display: grid; place-items: center; transition: background .3s; }
+.motif svg { width: 56px; height: 56px; display: block; fill: none; stroke: var(--se-ink-2); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: transform .45s var(--ease); }
+.motif .b { stroke: var(--se-blue); } .motif .dot { fill: var(--se-blue); stroke: none; }
+.motif .lbl { font-family: var(--math); font-style: italic; font-size: 9px; fill: var(--se-blue); stroke: none; }
+.exo:hover .motif { background: var(--se-blue-100); } .exo:hover .motif svg { transform: scale(1.06); }
+
+.corps { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding: 2px 0; }
+.num { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--se-blue); }
+.exo h2 { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.2; letter-spacing: -.015em; }
+.exo p { margin: 0; font-size: 13px; line-height: 1.4; color: var(--se-ink-3); }
+.pied { margin-top: auto; padding-top: 10px; display: flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 600; color: var(--se-blue); }
+.pied svg { width: 15px; height: 15px; transition: transform .3s var(--ease); }
+.exo:hover .pied svg { transform: translateX(3px); }
+
+/* Carte verrouillée : lisible, pas éteinte, mais non cliquable */
+.exo.verrou { cursor: default; box-shadow: 0 1px 2px rgba(11,21,38,.03); }
+.exo.verrou:hover, .exo.verrou:focus-visible { transform: none; border-color: var(--se-line); box-shadow: 0 1px 2px rgba(11,21,38,.03); }
+.exo.verrou .motif { background: var(--se-bg); }
+.exo.verrou:hover .motif { background: var(--se-bg); } .exo.verrou:hover .motif svg { transform: none; }
+.exo.verrou .motif svg { opacity: .55; }
+.exo.verrou .num { color: var(--se-ink-3); }
+.exo.verrou h2 { color: var(--se-ink-2); }
+.exo.verrou .pied { color: var(--se-ink-3); font-weight: 500; }
+.cadenas { position: absolute; z-index: 2; top: 12px; right: 12px; width: 28px; height: 28px; border-radius: 8px; background: var(--se-card); border: 1px solid var(--se-line); display: grid; place-items: center; color: var(--se-ink-3); }
+.cadenas svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.exo { position: relative; }
+.exo.verrou .corps { padding-right: 30px; }
+
+@media (min-width: 620px) {
+  .exo { flex-direction: column; gap: 12px; padding: 14px 14px 18px; }
+  .motif { flex: 0 0 auto; width: auto; min-height: 104px; }
+  .motif svg { width: 64px; height: 64px; }
+  .corps { padding: 0 4px; gap: 5px; }
+  .exo h2 { font-size: 18px; }
+}
+
+.note { margin: 18px 2px 0; font-size: 13px; color: var(--se-ink-3); }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 26px 2px 0; font-size: 12.5px; color: var(--se-ink-3); }
+
+.js .reveal { opacity: 0; transform: translateY(10px); }
+.js.is-ready .reveal { animation: rise .8s var(--ease) var(--d, 0ms) forwards; }
+@keyframes rise { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .reveal { opacity: 1; transform: none; }
+  .exo:hover { transform: none; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="top reveal" style="--d:0ms">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true"><rect x="0" y="10" width="5" height="8" rx="1.2" fill="#93B4FD"/><rect x="8.5" y="5" width="5" height="13" rx="1.2" fill="#6091FA"/><rect x="17" y="0" width="5" height="18" rx="1.2" fill="#2F63F5"/></svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+
+  <a class="retour reveal" style="--d:40ms" href="trigonometrie.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Retour au chapitre
+  </a>
+
+  <header class="hero">
+    <p class="hero__context reveal" style="--d:80ms">Mathématiques · Chapitre 01 · Trigonométrie</p>
+    <h1 class="reveal" style="--d:140ms">Je révise le cours</h1>
+    <p class="hero__sub reveal" style="--d:200ms">Le cours complet, ou une notion à la fois.</p>
+  </header>
+
+  <!-- La liste est remplie par le script à partir de EXERCICES -->
+  <main class="grille reveal" style="--d:280ms" id="grille" aria-label="Exercices du chapitre"></main>
+  <noscript><p style="color:#4A5878">Active JavaScript pour afficher les exercices.</p></noscript>
+
+  <p class="note reveal" style="--d:360ms">D’autres notions s’ajouteront au fil du chapitre.</p>
+
+  <footer class="foot reveal" style="--d:420ms">
+    <span>Une application conçue par ton professeur.</span>
+    <span>Première Bac Pro · ERA · TEBE · TMA</span>
+  </footer>
+</div>
+
+<script>
+/* =============================================================
+   LES EXERCICES DU CHAPITRE — tout se règle ici.
+   Pour ajouter un exercice : une ligne de plus dans EXERCICES.
+   ============================================================= */
+/* =============================================================
+   LES CARTES DE RÉVISION — tout se règle ici.
+   etat : 'active' → la carte s'ouvre sur son lien
+          'locked' → cadenas, « Bientôt disponible », pas de lien
+   Pour ouvrir une notion : mettre son lien et passer etat à 'active'.
+   ============================================================= */
+const REVISIONS = [
+  { num: 'SUPPORT DE COURS', titre: 'Je révise à l’aide du support de cours de M. Reydellet', sous: 'Le cours vu en classe, écran par écran.',
+    href: 'https://arnaudreydellet.github.io/support-de-cours-trigo/', etat: 'active', motif: 'support' },
+  { num: 'NOTION 1', titre: 'Reconnaître un côté adjacent et opposé',             sous: 'Une animation, étape par étape.', href: 'revision-cotes-trigonometrie.html', etat: 'active', motif: 'cotes' },
+  { num: 'NOTION 2', titre: 'Choisir sinus ou cosinus',                           sous: 'Une animation, étape par étape.', href: 'revision-sinus-cosinus.html', etat: 'active', motif: 'formule' },
+  { num: 'NOTION 3', titre: 'Résoudre un produit en croix à partir d’une formule', sous: 'Une animation, étape par étape.', href: 'revision-produit-en-croix.html', etat: 'active', motif: 'croix' },
+  { num: 'NOTION 4', titre: 'Le sens conventionnel d’un cercle trigonométrique',  sous: 'Une animation, étape par étape.', href: 'revision-sens-cercle.html', etat: 'active', motif: 'sens' },
+  { num: 'NOTION 5', titre: 'Calculer le périmètre d’un cercle',                  sous: 'Une animation, étape par étape.', href: 'revision-perimetre-cercle.html', etat: 'active', motif: 'perimetre' },
+  { num: 'NOTION 6', titre: 'Calculer une rotation en radian',                    sous: 'Une animation, étape par étape.', href: 'revision-rotation-radian.html', etat: 'active', motif: 'radian' },
+];
+
+/* Motifs (viewBox 0 0 40 40) : une seule idée par icône */
+const MOTIFS = {
+  // le support projeté : un écran avec un cercle trigonométrique
+  support: `
+    <rect x="4" y="7" width="32" height="22" rx="2" stroke="#4A5878"/>
+    <line x1="20" y1="29" x2="20" y2="34" stroke="#4A5878"/>
+    <line x1="13" y1="34" x2="27" y2="34" stroke="#4A5878"/>
+    <circle cx="20" cy="18" r="7" stroke="#8A96B3" stroke-width="1.2"/>
+    <line class="b" x1="20" y1="18" x2="25" y2="13" stroke-width="2"/>`,
+  // côtés : triangle rectangle, un côté mis en avant
+  cotes: `
+    <path d="M6 33 L34 33 L34 9 Z" stroke="#4A5878"/>
+    <path d="M28 33 v-6 h6" stroke="#4A5878" stroke-width="1.2"/>
+    <path class="b" d="M6 33 L34 9" stroke-width="3"/>
+    <text x="14" y="17" font-family="Sora, sans-serif" font-size="13" font-weight="700" fill="#2F63F5" stroke="none">?</text>`,
+  // sinus ou cosinus
+  formule: `
+    <text x="20" y="17" text-anchor="middle" font-family="Times New Roman, serif" font-size="14" fill="#2F63F5" stroke="none">sin</text>
+    <text x="20" y="34" text-anchor="middle" font-family="Times New Roman, serif" font-size="14" fill="#4A5878" stroke="none">cos</text>
+    <text x="20" y="25.5" text-anchor="middle" font-family="Sora, sans-serif" font-size="8" font-weight="700" fill="#8A96B3" stroke="none">ou</text>`,
+  // produit en croix : deux fractions et leurs diagonales
+  croix: `
+    <g style="font-family:'Times New Roman',serif;stroke:none">
+      <text x="9" y="16" text-anchor="middle" font-size="12" fill="#4A5878">a</text>
+      <line x1="3" y1="20" x2="15" y2="20" stroke="#4A5878" stroke-width="1.3"/>
+      <text x="9" y="32" text-anchor="middle" font-size="12" fill="#4A5878">b</text>
+      <text x="20" y="24" text-anchor="middle" font-size="11" fill="#8A96B3">=</text>
+      <text x="31" y="16" text-anchor="middle" font-size="12" fill="#4A5878">c</text>
+      <line x1="25" y1="20" x2="37" y2="20" stroke="#4A5878" stroke-width="1.3"/>
+      <text x="31" y="32" text-anchor="middle" font-size="12" fill="#4A5878">d</text>
+    </g>
+    <line class="b" x1="12" y1="12" x2="28" y2="29" stroke-width="1.4"/>
+    <line class="b" x1="28" y1="12" x2="12" y2="29" stroke-width="1.4"/>`,
+  // sens conventionnel : cercle, flèche dans le sens inverse des aiguilles d'une montre
+  sens: `
+    <circle cx="20" cy="20" r="13" stroke="#4A5878"/>
+    <path class="b" d="M33 20 A13 13 0 0 0 20 7" stroke-width="2.6"/>
+    <path class="b" d="M20 7 l4 -3 M20 7 l4 3" stroke-width="2.2"/>
+    <text x="30" y="11" font-family="Sora, sans-serif" font-size="10" font-weight="700" fill="#2F63F5" stroke="none">+</text>`,
+  // périmètre : le tour complet du cercle, et son rayon
+  perimetre: `
+    <circle class="b" cx="20" cy="20" r="13" stroke-width="2.6"/>
+    <line x1="20" y1="20" x2="33" y2="20" stroke="#4A5878" stroke-width="1.3"/>
+    <circle cx="20" cy="20" r="1.8" fill="#4A5878" stroke="none"/>
+    <text x="26.5" y="17.5" text-anchor="middle" font-family="Times New Roman, serif" font-style="italic" font-size="9" fill="#4A5878" stroke="none">r</text>`,
+  // radian : un arc de la longueur du rayon
+  radian: `
+    <circle cx="20" cy="22" r="12" stroke="#8A96B3" stroke-width="1.2"/>
+    <line x1="20" y1="22" x2="32" y2="22" stroke="#4A5878" stroke-width="1.3"/>
+    <line x1="20" y1="22" x2="26.5" y2="11.9" stroke="#4A5878" stroke-width="1.3"/>
+    <path class="b" d="M32 22 A12 12 0 0 0 26.5 11.9" stroke-width="2.6"/>
+    <text x="20" y="40" text-anchor="middle" font-family="Sora, sans-serif" font-size="7.5" font-weight="700" fill="#2F63F5" stroke="none">rad</text>`,
+};
+const FLECHE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+const CADENAS = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
+
+document.getElementById('grille').innerHTML = REVISIONS.map(r => {
+  const ouverte = r.etat === 'active' && r.href;
+  const balise = ouverte ? 'a' : 'div';
+  const attrs = ouverte ? `href="${r.href}"` : 'aria-disabled="true"';
+  return `
+  <${balise} class="exo${ouverte ? '' : ' verrou'}" ${attrs}>
+    ${ouverte ? '' : `<span class="cadenas">${CADENAS}</span>`}
+    <span class="motif" aria-hidden="true"><svg viewBox="0 0 40 40">${MOTIFS[r.motif] || ''}</svg></span>
+    <span class="corps">
+      <span class="num">${r.num}</span>
+      <h2>${r.titre}</h2>
+      ${r.sous ? `<p>${r.sous}</p>` : ''}
+      <span class="pied">${ouverte ? 'Commencer ' + FLECHE : 'Bientôt disponible'}</span>
+    </span>
+  </${balise}>`;
+}).join('');
+
+/* Retour : si l'élève vient de la page du chapitre, on y revient exactement */
+(function () {
+  const lien = document.querySelector('a.retour');
+  if (!lien) return;
+  lien.addEventListener('click', e => {
+    if (window.history.length <= 1) return;
+    e.preventDefault();
+    const garde = setTimeout(() => { window.location.href = lien.href; }, 400);
+    window.addEventListener('pagehide', () => clearTimeout(garde), { once: true });
+    window.history.back();
+  });
+})();
+
+requestAnimationFrame(() => requestAnimationFrame(() => document.documentElement.classList.add('is-ready')));
+</script>
+</body>
+</html>

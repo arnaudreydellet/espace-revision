@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F9FD">
+<meta name="color-scheme" content="light">
+<title>Calculer une rotation en radian — Trigonométrie</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script>document.documentElement.classList.replace('no-js','js');</script>
+
+<style>
+/* =============================================================
+   1. JETONS — charte Stud'Éval, mêmes couleurs de côtés que
+   l'animation « côté adjacent et opposé »
+     hypoténuse : gris-bleu · adjacent : bleu · opposé : bleu nuit
+   ============================================================= */
+:root {
+  --se-blue: #2F63F5; --se-blue-700: #244FCC; --se-blue-300: #93B4FD; --se-blue-200: #C6D4FD;
+  --se-blue-100: #E6EDFF; --se-blue-50: #F3F6FE;
+  --se-ink: #0B1526; --se-ink-2: #4A5878; --se-ink-3: #8A96B3;
+  --se-line: #DDE4F2; --se-line-2: #E9EEF8; --se-bg: #F7F9FD; --se-card: #FFFFFF;
+  --c-hyp: #6B7A99; --c-adj: #2F63F5; --c-opp: #0B1526;
+  --r-card: 18px; --r-btn: 12px;
+  --font: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --math: 'Times New Roman', Times, serif;
+  --ease: cubic-bezier(.22,.8,.22,1);
+  --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px);
+}
+
+/* =============================================================
+   2. BASE
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; min-height: 100dvh; font-family: var(--font); color: var(--se-ink); background: var(--se-bg); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(to right, rgba(47,99,245,.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(47,99,245,.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%); mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.25) 100%);
+}
+button, a { touch-action: manipulation; }
+.app { position: relative; z-index: 1; min-height: 100dvh; display: flex; flex-direction: column; max-width: 640px; margin: 0 auto;
+  padding: calc(14px + var(--sat)) calc(16px + var(--sar)) calc(20px + var(--sab)) calc(16px + var(--sal)); }
+@media (min-width: 760px) { .app { padding: calc(24px + var(--sat)) calc(32px + var(--sar)) calc(28px + var(--sab)) calc(32px + var(--sal)); } }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.brand { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 2px; text-decoration: none; color: var(--se-blue); font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+.brand svg { width: 22px; height: 18px; display: block; }
+.badge { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: var(--se-blue-100); color: var(--se-blue-700); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.retour { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; margin: 6px 0 0 -6px; min-height: 48px; padding: 4px 10px 4px 6px; color: var(--se-ink-2); font-size: 14px; font-weight: 500; text-decoration: none; border-radius: 8px; transition: color .25s; }
+.retour svg { width: 16px; height: 16px; transition: transform .3s var(--ease); }
+.retour:hover { color: var(--se-blue); } .retour:hover svg { transform: translateX(-3px); }
+.retour:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+.contexte { margin: 2px 0 10px; font-size: 13px; font-weight: 500; color: var(--se-ink-3); }
+
+/* =============================================================
+   3. LA CARTE — tout est à l'intérieur
+   ============================================================= */
+.carte {
+  position: relative; padding: 14px 14px 18px;
+  background: var(--se-card); border: 1px solid var(--se-line); border-radius: var(--r-card);
+  box-shadow: 0 1px 2px rgba(11,21,38,.04), 0 8px 22px -14px rgba(11,21,38,.12);
+}
+.entete-carte { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.avance { flex: 1; height: 4px; border-radius: 999px; background: var(--se-blue-100); overflow: hidden; }
+.avance span { display: block; height: 100%; width: 0; background: var(--se-blue); border-radius: 999px; transition: width .5s var(--ease); }
+.compteur { font-size: 12.5px; font-weight: 600; color: var(--se-ink-3); white-space: nowrap; }
+
+/* --- La scène : la figure à gauche, la rédaction à droite, écrite comme au tableau --- */
+.scene { display: grid; grid-template-columns: 1fr; align-items: start; gap: 6px; margin-top: 4px; }
+.scene.avec-calcul { grid-template-columns: 1fr; }
+#scene { display: block; width: 100%; height: 250px; max-height: 34vh; margin: 0 auto; transition: height .8s var(--ease), opacity .5s; }
+.scene.avec-calcul #scene { height: 168px; }
+.scene.long #scene { display: none; }
+/* le long calcul de L : la figure s'efface, le calcul prend toute la place (plutôt qu'un dessin minuscule) */
+.scene.long .copie { font-size: 24px; row-gap: 4px; }
+.scene.long .deja { margin-bottom: 6px; padding-bottom: 5px; }
+
+.calcul { min-width: 0; min-height: 0; padding-top: 4px; }
+.scene.avec-calcul .calcul { min-height: 250px; }
+/* ce qui est déjà écrit plus haut sur la copie : en gris, plus petit */
+.deja { display: flex; flex-wrap: wrap; justify-content: center; column-gap: 22px; row-gap: 4px; align-items: center;
+  margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed var(--se-line);
+  font-family: var(--math); font-size: 18px; color: var(--se-ink-3); }
+.deja .manque { color: var(--se-blue); font-weight: 700; }
+.deja .dl { display: inline-flex; align-items: center; gap: .25em; white-space: nowrap; }
+.deja .dl .g { font-style: italic; }
+/* le calcul en cours : les signes = alignés en colonne, comme sur une copie */
+.copie { display: grid; grid-template-columns: auto auto auto; justify-content: center; column-gap: .3em; row-gap: 6px; align-items: center;
+  font-family: var(--math); font-size: 26px; color: var(--se-ink); }
+.copie > .g, .deja > .g { text-align: right; font-style: italic; white-space: nowrap; }
+.copie > .eg, .deja > .eg { color: var(--se-ink-2); text-align: center; }
+.copie > .d, .deja > .d { white-space: nowrap; }
+.copie > .entre { animation: rise .6s var(--ease) both; }
+.copie > .res { color: var(--se-blue-700); font-weight: 700; }
+.copie > .cadre-ligne { grid-column: 1 / -1; justify-self: center; margin-top: 4px; padding: 2px 14px; border: 1.5px solid var(--se-blue-300); border-radius: 10px; background: var(--se-blue-50); color: var(--se-blue-700); font-weight: 700; white-space: nowrap; }
+.copie > .cadre-ligne .g { font-style: italic; }
+.copie > .cadre-ligne.entre { animation: rise .6s var(--ease) both; }
+.v { font-style: italic; }
+.fr { display: inline-flex; flex-direction: column; align-items: stretch; text-align: center; vertical-align: middle; margin: 0 .08em; line-height: 1.1; }
+.fr > span:first-child { border-bottom: .07em solid currentColor; padding: 0 .15em .04em; }
+.fr > span:last-child { padding: .04em .15em 0; }
+/* le terme à calculer : l'élève le touche pour ouvrir son calcul */
+.a-calculer { display: inline-grid; place-items: center; min-width: 44px; min-height: 40px; padding: 0 8px; border: 0; border-radius: 10px;
+  background: var(--se-blue-100); color: var(--se-blue-700); font: italic 700 1em var(--math); cursor: pointer;
+  animation: appel 1.6s ease-out infinite; -webkit-tap-highlight-color: transparent; }
+.a-calculer:hover { background: var(--se-blue-200); }
+.a-calculer:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 2px; }
+@keyframes appel { 0% { box-shadow: 0 0 0 0 rgba(47,99,245,.45); } 70% { box-shadow: 0 0 0 12px rgba(47,99,245,0); } 100% { box-shadow: 0 0 0 0 rgba(47,99,245,0); } }
+.fr .a-calculer { margin-bottom: 2px; }
+.btn.attente, .btn.attente[disabled] { background: var(--se-bg); color: var(--se-blue-700); border: 1.5px dashed var(--se-blue-300); cursor: default; opacity: 1; white-space: normal; }
+.chaine { display: grid; grid-template-columns: auto auto auto; justify-content: center; column-gap: .3em; row-gap: 14px; align-items: center; font-family: var(--math); font-size: 23px; }
+.chaine .n { font: 700 12px var(--font); color: var(--se-blue-700); background: var(--se-blue-100); width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; }
+@media (max-width: 360px) { .copie { font-size: 23px; } .deja { font-size: 16px; } .chaine { font-size: 20px; } .scene.avec-calcul #scene { height: 140px; } .scene.avec-calcul .calcul { min-height: 240px; } }
+
+.cercle { fill: none; stroke: var(--se-line); stroke-width: 2; transition: stroke .6s, stroke-width .6s; }
+.cercle.tour { stroke: var(--se-blue); stroke-width: 4; }
+.quart { stroke: var(--se-ink-3); stroke-width: 1; stroke-dasharray: 3 3; transition: opacity .6s; }
+.arc { fill: none; stroke: var(--se-blue); stroke-width: 5; stroke-linecap: round; transition: opacity .5s; }
+.rayon { stroke: var(--se-ink-2); stroke-width: 2.2; stroke-linecap: round; }
+.point { fill: var(--se-ink-2); }
+.point-m { fill: var(--se-blue); stroke: #fff; stroke-width: 2; }
+.angle { fill: rgba(47,99,245,.10); stroke: var(--se-blue); stroke-width: 1.4; transition: opacity .5s; }
+.deg { font-family: var(--font); font-size: 10.5px; font-weight: 700; fill: var(--se-blue-700); text-anchor: middle; dominant-baseline: central; }
+.cote-l { transition: opacity .6s var(--ease); }
+.attache { stroke: var(--se-ink-3); stroke-width: 1; }
+.cote-arc { fill: none; stroke: var(--se-ink-2); stroke-width: 1.2; }
+.pointe { fill: var(--se-ink-2); }
+.lettre { font-family: var(--math); font-style: italic; font-size: 17px; fill: var(--se-ink-2); text-anchor: middle; dominant-baseline: central; transition: opacity .5s; }
+.lettre.l-cote, .lettre.r-lab { fill: var(--se-ink); }
+.lettre.m-lab { fill: var(--se-blue); }
+.lettre.mesure { font-family: var(--font); font-style: normal; font-size: 12px; font-weight: 700; fill: var(--se-ink); }
+.cache-svg { opacity: 0 !important; }
+/* --- La légende, hauteur réservée --- */
+.legende { min-height: 104px; margin-top: 10px; padding: 12px 4px 0; border-top: 1px solid var(--se-line-2); text-align: center; }
+.legende__titre { margin: 0 0 6px; font-size: 17px; font-weight: 700; line-height: 1.25; letter-spacing: -.015em; color: var(--se-ink); }
+.legende__texte { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--se-ink-2); }
+.legende b { color: var(--se-ink); font-weight: 600; }
+.legende.entre > * { animation: rise .7s var(--ease) both; }
+.legende.entre > *:nth-child(2) { animation-delay: .15s; }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.seg { font-family: var(--math); font-style: italic; }
+.regle { margin: 8px 0 0; font-size: 15.5px; line-height: 1.7; color: var(--se-ink-2); }
+
+/* --- Les boutons, dans la carte --- */
+.commandes { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; margin-top: 16px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; width: 100%; min-height: 50px; padding: 12px 14px; border: 0; border-radius: var(--r-btn); background: var(--se-blue); color: #fff; font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; transition: background .25s, opacity .25s; -webkit-tap-highlight-color: transparent; }
+.btn svg { width: 17px; height: 17px; }
+.btn:hover { background: var(--se-blue-700); }
+.btn:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+.btn--secondaire { background: var(--se-card); color: var(--se-blue); border: 1px solid var(--se-blue-200); }
+.btn--secondaire:hover { background: var(--se-blue-50); }
+.btn[disabled] { opacity: .4; cursor: default; }
+
+
+/* Petit écran : le bouton de gauche prend juste sa place, aucun libellé ne se coupe */
+.commandes .btn { white-space: nowrap; }
+@media (max-width: 380px) {
+  .commandes { grid-template-columns: auto 1fr; }
+  .commandes .btn { font-size: 14.5px; padding: 12px 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+.it { font-family: var(--math); font-style: italic; }
+</style>
+</head>
+
+<body>
+<div class="app">
+  <div class="top">
+    <a class="brand" href="index.html" aria-label="Stud'Éval — accueil">
+      <svg viewBox="0 0 22 18" aria-hidden="true"><rect x="0" y="10" width="5" height="8" rx="1.2" fill="#93B4FD"/><rect x="8.5" y="5" width="5" height="13" rx="1.2" fill="#6091FA"/><rect x="17" y="0" width="5" height="18" rx="1.2" fill="#2F63F5"/></svg>
+      Stud’Éval
+    </a>
+    <span class="badge">Première Bac Pro</span>
+  </div>
+  <a class="retour" href="revision-trigonometrie.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    Retour aux révisions
+  </a>
+  <p class="contexte">Trigonométrie · Je révise · Rotation en radian</p>
+
+  <div class="carte">
+    <div class="entete-carte" aria-hidden="true">
+      <div class="avance"><span id="avance"></span></div>
+      <span class="compteur" id="compteur"></span>
+    </div>
+
+    <div class="scene" id="scene-bloc">
+      <svg id="scene" viewBox="-74 -84 156 152" focusable="false" aria-hidden="true">
+        <circle class="cercle" data-cercle r="48"/>
+        <line class="quart cache-svg" data-q1 x1="-48" y1="0" x2="0" y2="0"/>
+        <line class="quart cache-svg" data-q2 x1="0" y1="0" x2="0" y2="48"/>
+        <path class="angle" data-ang d=""/>
+        <path class="arc" data-arc d=""/>
+        <line class="rayon" x1="0" y1="0" x2="48" y2="0"/>
+        <line class="rayon" data-om x1="0" y1="0" x2="48" y2="0"/>
+        <g class="cote-l cache-svg" data-cote>
+          <line class="attache" data-att1/><line class="attache" data-att2/>
+          <path class="cote-arc" data-carc d=""/>
+          <path class="pointe" data-p1 d=""/><path class="pointe" data-p2 d=""/>
+          <text class="lettre l-cote" data-ll>L</text>
+        </g>
+        <circle class="point" r="2.6"/>
+        <circle class="point" cx="48" cy="0" r="2.8"/>
+        <circle class="point" cx="0" cy="-48" r="2.8"/>
+        <text class="deg" data-deg>0°</text>
+        <text class="lettre" x="-10" y="11">O</text>
+        <text class="lettre" x="58" y="10">I</text>
+        <text class="lettre" data-lj x="-17" y="-60">J</text>
+        <text class="lettre r-lab cache-svg" data-lr x="27" y="11">r</text>
+        <circle class="point-m" data-m cx="48" cy="0" r="5"/>
+        <text class="lettre m-lab" data-lm x="60" y="-10">M</text>
+      </svg>
+      <div class="calcul" id="calcul"></div>
+    </div>
+
+    <div class="legende" id="legende" aria-live="polite"></div>
+
+    <div class="commandes">
+      <button class="btn btn--secondaire" type="button" id="prec">Précédent</button>
+      <button class="btn" type="button" id="suiv"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   CALCULER UNE ROTATION EN RADIAN — on part de la question
+   On écrit θ = L / r ; il manque L : l'élève touche L pour ouvrir son
+   calcul ; dans ce calcul il manque P : il touche P, qui est remplacé
+   sur place par 2 × π × r ; le calcul de L continue, puis on revient à θ.
+   Ligne du cours : on parle de ROTATION ; π reste écrit π, le ≈
+   n'apparaît qu'à la toute fin ; une opération par ligne.
+   Notations : O centre, I départ, J point du haut, M point qui tourne.
+   A. Écriture   B. Les étapes   C. Figure et état   D. Navigation
+   ============================================================= */
+(function () {
+'use strict';
+
+/* ------------------------------------------------------------
+   A. ÉCRITURE — comme sur une copie : une ligne = « membre = calcul »,
+   les signes = alignés en colonne, vraies fractions, lettres en italique
+   ------------------------------------------------------------ */
+const V = t => `<span class="v">${t}</span>`;
+const FR = (a, b) => `<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const TOUCHE = c => `<button class="a-calculer" type="button" data-cible="${c}" aria-label="Calculer ${c}">${c}</button>`;
+const MANQUE = c => `<span class="manque">${c}</span>`;
+// une ligne : [membre de gauche, signe, membre de droite, options]
+const L_ = (g, d, o = {}) => ({ g, s: o.s || '=', d, res: !!o.res, cadre: !!o.cadre });
+
+/* le calcul de θ */
+const TH1 = L_('θ', FR(V('L'), V('r')));
+const TH1c = L_('θ', FR(TOUCHE('L'), V('r')));
+const TH2 = L_('θ', FR('2π', '4'));
+const TH3 = L_('θ', `${FR('π', '2')} rad`);
+const TH4 = L_('θ', '1,57 rad', { s: '≈', res: true, cadre: true });
+/* le calcul de L : un seul calcul, continu — la part du tour fois le périmètre,
+   et le périmètre P remplacé DANS la même ligne par sa formule 2 × π × r */
+const LO1 = L_('L', `${FR('90', '360')} × ${V('P')}`);
+const LO1c = L_('L', `${FR('90', '360')} × ${TOUCHE('P')}`);
+const LO2 = L_('L', `${FR('90', '360')} × 2 × π × ${V('r')}`);
+const LO3 = L_('L', `${FR('90', '360')} × 2 × π × 4`);
+const LO4 = L_('L', `${FR('1', '4')} × 2 × π × 4`);
+const LO5 = L_('L', FR('1 × 2 × π × 4', '4'));     // tout sur une seule fraction
+const LO6 = L_('L', FR('8π', '4'));                   // puis les calculs
+const LO7 = L_('L', '2π cm', { res: true });
+
+/* ce qui est déjà écrit, rappelé en gris */
+const D_TH = L_('θ', FR(MANQUE('L'), V('r')));             // θ en attente de L
+const D_PF = L_('P', `2 × π × ${V('r')}`);                  // la formule du périmètre, rappelée
+const D_L  = L_('L', '2π cm');
+
+/* ------------------------------------------------------------
+   B. LES ÉTAPES — on raisonne comme au tableau :
+   la formule de θ → il manque L → je calcule L, et dans ce même
+   calcul je remplace P par sa formule → je reviens à θ.
+   deja   : lignes déjà écrites, rappelées en gris au-dessus
+   copie  : le calcul en cours
+   clic   : l'étape attend que l'élève touche ce terme pour continuer
+   ------------------------------------------------------------ */
+const FIG0 = { cote: true, r: '4 cm' }, FIG1 = { quarts: true, cote: true, r: '4 cm' }, FIG2 = { tour: true, r: '4 cm' };
+const ETAPES = [
+  { fig: { r: '4 cm' },
+    titre: 'La question',
+    texte: `<span class="it">M</span> tourne de <span class="it">I</span> à <span class="it">J</span> sur un cercle de rayon 4 cm. <b>Quelle est cette rotation en radians ?</b>` },
+
+  { fig: FIG0, copie: [TH1],
+    titre: 'J’utilise la formule du cours',
+    texte: `Une rotation en radians : <b>θ = L / r</b>.` },
+  { fig: FIG0, copie: [TH1c], clic: 'L',
+    titre: 'Il me manque L',
+    texte: `<span class="it">r</span>, je le connais : 4 cm. Mais <span class="it">L</span>, la longueur parcourue, je ne la connais pas. <b>Touche L</b> pour la calculer.` },
+
+  { fig: FIG1, deja: [D_TH], copie: [LO1],
+    titre: 'La longueur parcourue',
+    texte: `<span class="it">M</span> a tourné de <b>90°</b> sur les <b>360°</b> du tour : <span class="it">L</span> est cette part du périmètre <span class="it">P</span>.` },
+  { fig: FIG1, deja: [D_TH], copie: [LO1c], clic: 'P',
+    titre: 'Il me manque P',
+    texte: `<span class="it">P</span>, c’est le périmètre du cercle. <b>Touche P</b> pour le remplacer par sa formule.` },
+  { fig: FIG2, deja: [D_TH, D_PF], copie: [LO1, LO2],
+    titre: 'Je remplace P par sa formule',
+    texte: `Le périmètre, c’est <b>P = 2 × π × r</b>. Je l’écris à la place de <span class="it">P</span>, dans le même calcul.` },
+  { fig: FIG1, deja: [D_TH], copie: [LO1, LO2, LO3],
+    titre: 'Je remplace r',
+    texte: `Le rayon mesure 4 cm : je remplace <span class="it">r</span> par 4.` },
+  { fig: FIG1, deja: [D_TH], copie: [LO1, LO2, LO3, LO4],
+    titre: 'Je simplifie la fraction',
+    texte: `90 sur 360, c’est un quart du tour : 1 sur 4.` },
+  { fig: FIG1, deja: [D_TH], copie: [LO1, LO2, LO3, LO4, LO5],
+    titre: 'Tout sur une seule fraction',
+    texte: `J’écris tout le calcul sur <b>une seule fraction</b> : les nombres du haut au-dessus, le 4 en dessous.` },
+  { fig: FIG1, deja: [D_TH], copie: [LO1, LO2, LO3, LO4, LO5, LO6],
+    titre: 'Je calcule le haut',
+    texte: `En haut : 1 × 2 × 4 = 8, et on garde π. Ça donne 8π. En bas, il reste 4.` },
+  { fig: FIG1, deja: [D_TH], copie: [LO1, LO2, LO3, LO4, LO5, LO6, LO7],
+    titre: 'L est trouvé',
+    texte: `8π divisé par 4 : <b>L = 2π cm</b>. Je peux revenir au calcul de θ.` },
+
+  { fig: FIG0, deja: [D_L], copie: [TH1, TH2],
+    titre: 'Je remplace L et r',
+    texte: `Je reprends θ = <span class="it">L</span> / <span class="it">r</span> : <span class="it">L</span> devient 2π, <span class="it">r</span> devient 4.` },
+  { fig: FIG0, deja: [D_L], copie: [TH1, TH2, TH3],
+    titre: 'La valeur exacte',
+    texte: `2π divisé par 4, c’est π divisé par 2.` },
+  { fig: FIG0, deja: [D_L], copie: [TH1, TH2, TH3, TH4],
+    titre: 'La rotation de 90° mesure π/2 radians',
+    texte: `À la calculatrice, π/2 ≈ 1,57. Le signe ≈ n’apparaît qu’à la toute fin.` },
+
+  { fig: { cote: true, r: true }, chaine: true, fin: true,
+    titre: 'À retenir',
+    texte: `Je pars de θ = <span class="it">L</span> / <span class="it">r</span>. Pour <span class="it">L</span>, je prends la part du tour du périmètre, et je remplace <span class="it">P</span> par 2 × π × <span class="it">r</span>.` },
+];
+
+/* ------------------------------------------------------------
+   C. FIGURE — M tourne une fois, de I à J ; le reste s'allume
+   ------------------------------------------------------------ */
+const svg = document.getElementById('scene'), bloc = document.getElementById('scene-bloc'), calcul = document.getElementById('calcul');
+const q = sel => svg.querySelector(sel);
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const R = 48, rad = d => d * Math.PI / 180, f = n => n.toFixed(2);
+let angle = 0, anim = null;
+
+function placer(a) {
+  const P = (ang, r) => [r * Math.cos(rad(ang)), -r * Math.sin(rad(ang))];
+  const [x, y] = P(a, R);
+  q('[data-m]').setAttribute('cx', f(x)); q('[data-m]').setAttribute('cy', f(y));
+  const om = q('[data-om]'); om.setAttribute('x2', f(x)); om.setAttribute('y2', f(y));
+  q('[data-arc]').setAttribute('d', a < .5 ? '' : `M${R} 0 A${R} ${R} 0 0 0 ${f(x)} ${f(y)}`);
+  // l'angle au centre, et sa mesure en degrés qui grandit avec la rotation
+  const [ax, ay] = P(a, 15);
+  q('[data-ang]').setAttribute('d', a < 1 ? '' : `M0 0 L15 0 A15 15 0 0 0 ${f(ax)} ${f(ay)} Z`);
+  const [dx, dy] = P(a / 2, 30), deg = q('[data-deg]');
+  deg.textContent = `${Math.round(a)}°`; deg.setAttribute('x', f(dx)); deg.setAttribute('y', f(dy));
+  // tant que l'angle est étroit, la mesure n'a pas la place entre les deux rayons : elle attend
+  deg.style.opacity = Math.max(0, Math.min(1, (a - 36) / 8));
+  // la cote de l'arc, à l'extérieur du cercle
+  const RC = 60, [c0x, c0y] = P(0, RC), [c1x, c1y] = P(a, RC);
+  q('[data-carc]').setAttribute('d', a < 1 ? '' : `M${f(c0x)} ${f(c0y)} A${RC} ${RC} 0 0 0 ${f(c1x)} ${f(c1y)}`);
+  const att = (el, ang) => { const [x0, y0] = P(ang, R + 4), [x1, y1] = P(ang, RC + 5); el.setAttribute('x1', f(x0)); el.setAttribute('y1', f(y0)); el.setAttribute('x2', f(x1)); el.setAttribute('y2', f(y1)); };
+  att(q('[data-att1]'), 0); att(q('[data-att2]'), a);
+  // pointes de flèche tournées vers les lignes d'attache
+  const pointe = (el, ang, sens) => {
+    const [px, py] = P(ang, RC), t = [sens * Math.sin(rad(ang)), sens * Math.cos(rad(ang))], n = [-t[1], t[0]];
+    const bx = px - t[0] * 7, by = py - t[1] * 7;
+    el.setAttribute('d', `M${f(px)} ${f(py)} L${f(bx + n[0] * 3)} ${f(by + n[1] * 3)} L${f(bx - n[0] * 3)} ${f(by - n[1] * 3)} Z`);
+  };
+  pointe(q('[data-p1]'), 0, 1); pointe(q('[data-p2]'), a, -1);
+  const [lx, ly] = P(a / 2, RC + 12), ll = q('[data-ll]'); ll.setAttribute('x', f(lx)); ll.setAttribute('y', f(ly));
+  // la lettre M, à l'extérieur ; à l'arrivée en J elle se place à droite de J
+  const lm = P(a + 16, R + 14), t = q('[data-lm]'), fin = a >= 89.5, px = fin ? 13 : lm[0], py = fin ? -73 : lm[1];
+  t.setAttribute('x', f(px)); t.setAttribute('y', f(py));
+  t.style.fillOpacity = fin ? 1 : Math.max(0, Math.min(1, (Math.hypot(px + 17, py + 60) - 20) / 10));
+}
+function tourner(vers) {
+  if (anim) cancelAnimationFrame(anim);
+  const de = angle;
+  if (reduceMotion || de === vers) { angle = vers; placer(vers); return; }
+  const duree = 1800, t0 = performance.now(), doux = u => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+  const pas = now => { const u = Math.min(1, (now - t0) / duree); angle = de + (vers - de) * doux(u); placer(angle); anim = u < 1 ? requestAnimationFrame(pas) : null; };
+  anim = requestAnimationFrame(pas);
+}
+
+const CHAINE = `<div class="chaine">
+  <span class="n">1</span><span>θ</span><span>= ${FR(V('L'), V('r'))}</span>
+  <span class="n">2</span><span class="v">L</span><span>= ${FR('angle', '360')} × <span class="v">P</span></span>
+  <span class="n">3</span><span class="v">P</span><span>= 2 × π × <span class="v">r</span></span>
+</div>`;
+let affiche = [];
+const cle = l => l.g + l.s + l.d;
+function lignes(tab, avecEntree) {
+  return tab.map(l => {
+    const neuf = avecEntree && !affiche.includes(cle(l)) ? ' entre' : '';
+    // le résultat final s'encadre en entier, comme sur une copie
+    if (l.cadre) return `<span class="cadre-ligne${neuf}"><span class="g">${l.g}</span> ${l.s} ${l.d}</span>`;
+    return `<span class="g${neuf}${l.res ? ' res' : ''}">${l.g}</span><span class="eg${neuf}${l.res ? ' res' : ''}">${l.s}</span><span class="d${neuf}${l.res ? ' res' : ''}">${l.d}</span>`;
+  }).join('');
+}
+function etat(E, i) {
+  if (i === 0) { angle = 0; placer(0); }
+  tourner(90);
+  const F = E.fig || {};
+  q('[data-cercle]').classList.toggle('tour', !!F.tour);
+  q('[data-arc]').classList.toggle('cache-svg', !!F.tour);            // pendant le périmètre, c'est le tour entier qui compte
+  q('[data-ang]').classList.toggle('cache-svg', !!F.tour);
+  q('[data-deg]').classList.toggle('cache-svg', !!F.tour);
+  q('[data-q1]').classList.toggle('cache-svg', !F.quarts); q('[data-q2]').classList.toggle('cache-svg', !F.quarts);
+  q('[data-cote]').classList.toggle('cache-svg', !F.cote);
+  const lr = q('[data-lr]');
+  lr.textContent = F.r === true || !F.r ? 'r' : F.r;
+  lr.setAttribute('class', `lettre r-lab ${F.r && F.r !== true ? 'mesure' : ''} ${F.r ? '' : 'cache-svg'}`);
+  let html = '';
+  if (E.chaine) { html = CHAINE; affiche = []; }
+  else if (E.copie) {
+    html = (E.deja ? `<div class="deja">${E.deja.map(l => `<span class="dl"><span class="g">${l.g}</span><span>${l.s}</span><span>${l.d}</span></span>`).join('')}</div>` : '') + `<div class="copie">${lignes(E.copie, true)}</div>`;
+    affiche = E.copie.map(cle);
+  } else affiche = [];
+  bloc.classList.toggle('avec-calcul', !!html);
+  bloc.classList.toggle('long', !!(E.copie && E.copie.length >= 4 && E.copie[0].g === 'L'));   // le long calcul de L
+  calcul.innerHTML = html;
+  // le terme à toucher ouvre son calcul : c'est l'élève qui décide de chercher L, puis P
+  const t = calcul.querySelector('.a-calculer');
+  if (t) t.addEventListener('click', ev => { ev.stopPropagation(); aller(etape + 1); });
+}
+
+/* ------------------------------------------------------------
+   D. NAVIGATION — un clic par étape
+   ------------------------------------------------------------ */
+const legende = document.getElementById('legende'), barre = document.getElementById('avance'), compteur = document.getElementById('compteur');
+const prec = document.getElementById('prec'), suiv = document.getElementById('suiv');
+const EXERCICE = 'entrainement-trigonometrie-05.html';
+const FLECHE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+let etape = 0;
+
+function aller(i) {
+  etape = Math.max(0, Math.min(ETAPES.length - 1, i));
+  const E = ETAPES[etape], derniere = !!E.fin;
+  etat(E, etape);
+  legende.innerHTML = `<p class="legende__titre">${E.titre}</p><p class="legende__texte">${E.texte}</p>`;
+  legende.classList.remove('entre'); void legende.offsetWidth; legende.classList.add('entre');
+  barre.style.width = ((etape + 1) / ETAPES.length * 100) + '%';
+  compteur.textContent = `${etape + 1} / ${ETAPES.length}`;
+  prec.disabled = etape === 0;
+  prec.textContent = derniere ? '↺ Revoir' : 'Précédent';
+  if (E.clic) {
+    // l'étape attend que l'élève touche L (ou P) dans le calcul
+    suiv.disabled = true; suiv.classList.add('attente');
+    suiv.innerHTML = `Touche <span class="it" style="margin:0 .25em;font-size:1.15em">${E.clic}</span> ↑`;
+  } else {
+    suiv.disabled = false; suiv.classList.remove('attente');
+    suiv.innerHTML = (derniere ? 'Je m’entraîne ' : 'Suivant ') + FLECHE;
+  }
+}
+prec.addEventListener('click', () => ETAPES[etape].fin ? aller(0) : aller(etape - 1));
+suiv.addEventListener('click', () => { const E = ETAPES[etape]; if (E.clic) return; E.fin ? (window.location.href = EXERCICE) : aller(etape + 1); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { if (e.target.closest && e.target.closest('.a-calculer')) return; e.preventDefault(); if (!ETAPES[etape].fin && !ETAPES[etape].clic) aller(etape + 1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); aller(etape - 1); }
+});
+let x0 = null, y0 = null;
+bloc.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+bloc.addEventListener('touchend', e => {
+  if (x0 === null) return;
+  const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) { if (dx < 0 && !ETAPES[etape].fin && !ETAPES[etape].clic) aller(etape + 1); if (dx > 0) aller(etape - 1); }
+  x0 = null;
+}, { passive: true });
+
+placer(0);
+requestAnimationFrame(() => aller(0));
+
+/* Contrôle interne : chaque résultat affiché est juste */
+console.assert(2 * 4 === 8, 'P = 8π');  // P = 2 × π × 4
+console.assert(90 / 360 === 1 / 4, 'un quart du tour');
+console.assert(8 / 4 === 2, 'L = 2π');
+console.assert(Math.abs(2 * Math.PI / 4 - Math.PI / 2) < 1e-12 && Math.abs(Math.PI / 2 - 1.57) < .005, 'θ = π/2 ≈ 1,57');
+
+/* Retour : si l'élève vient de la page des révisions, on y revient exactement */
+const lien = document.querySelector('a.retour');
+lien.addEventListener('click', e => {
+  if (window.history.length <= 1) return;
+  e.preventDefault();
+  const garde = setTimeout(() => { window.location.href = lien.href; }, 400);
+  window.addEventListener('pagehide', () => clearTimeout(garde), { once: true });
+  window.history.back();
+});
+})();
+</script>
+</body>
+</html>
