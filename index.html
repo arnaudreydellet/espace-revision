@@ -191,6 +191,86 @@ body::before {
 .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding: 22px 2px 0; font-size: 12.5px; color: var(--se-ink-3); }
 
 /* =============================================================
+   9. TÉLÉPHONE — l'écran d'accueil de l'application Stud'Éval
+   Repris de zéro. Fond uni, sans trame. Deux cartes blanches qui se
+   partagent l'écran : un panneau clair avec le dessin, puis une ligne
+   nette — titre, thèmes, et un chevron discret. Une seule couleur
+   d'accent, le bleu Stud'Éval. Rien ne défile.
+   ============================================================= */
+.texte { display: contents; }                       /* sur ordinateur, comme avant */
+.hero__mobile, .chevron, .etiquette { display: none; }
+.carte--bientot { cursor: default; }
+.carte--bientot .btn { background: var(--se-blue-100); color: var(--se-blue-700); }
+.carte--bientot .btn svg { display: none; }
+.carte--bientot:hover { transform: none; }
+.carte--bientot .carte__figure svg { opacity: .6; }
+
+@media (max-width: 759px) {
+  body { background: #F4F6FB; }
+  body::before { display: none; }                   /* plus de trame sur téléphone */
+  .app { padding: calc(10px + var(--sat)) calc(18px + var(--sar)) calc(18px + var(--sab)) calc(18px + var(--sal)); }
+
+  .top { min-height: 44px; }
+  .brand { font-size: 17px; letter-spacing: -.02em; }
+  .brand svg { width: 24px; height: 20px; }
+  .badge { font-size: 11.5px; padding: 6px 11px; background: #fff; border: 1px solid var(--se-blue-200); color: var(--se-blue-700); }
+
+  .hero { padding: 20px 0 18px; }
+  .hero__context { margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--se-ink-3); }
+  .hero h1 { margin: 0; font-size: clamp(25px, 7.3vw, 31px); letter-spacing: -.032em; line-height: 1.05; }
+  .hero__sub { display: none; }
+  .hero__mobile { display: block; margin: 8px 0 0; font-size: 15px; line-height: 1.4; color: var(--se-ink-2); }
+
+  /* deux cartes, l'une sous l'autre, qui prennent toute la hauteur restante */
+  .matieres { flex: 1 1 auto; min-height: 0; grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; gap: 14px; }
+  .carte { min-height: 0; border-radius: 22px; border: 1px solid #E3E9F5; background: #fff;
+    box-shadow: 0 10px 28px -20px rgba(11,21,38,.35); transition: transform .2s var(--ease); }
+  .carte:hover, .carte:focus-visible { transform: none; border-color: #E3E9F5; box-shadow: 0 10px 28px -20px rgba(11,21,38,.35); }
+  .carte:active { transform: scale(.985); }
+  .carte:focus-visible { outline: 3px solid var(--se-blue); outline-offset: 3px; }
+
+  /* le panneau du dessin : clair, uni, sans trame */
+  .carte__figure { aspect-ratio: auto; flex: 1 1 auto; min-height: 0; margin: 8px; border-radius: 15px; border: 0;
+    background: linear-gradient(180deg, #EEF3FE 0%, #F5F8FE 100%); }
+  .carte__figure svg { inset: 10px 10px 4px; width: calc(100% - 20px); height: calc(100% - 14px); }
+  .carte:hover .carte__figure svg { transform: none; }
+  .fig-grid { display: none; }
+  .carte--maths .m-curve { stroke-width: 2.6; }
+  .carte--physique .p-wave { stroke-width: 2.6; }
+  .carte--bientot .carte__figure svg { opacity: .7; }
+
+  /* la ligne du bas : titre et thèmes à gauche, l'action à droite */
+  .carte__body { display: flex; flex-direction: row; align-items: center; gap: 12px; padding: 4px 14px 14px 18px; }
+  .texte { display: flex; flex-direction: column; gap: 3px; flex: 1 1 auto; min-width: 0; }
+  .carte__body h2 { font-size: 19px; letter-spacing: -.02em; }
+  .carte__body p  { font-size: 12.5px; line-height: 1.4; color: var(--se-ink-2); }
+  .btn { display: none; }
+  .chevron { display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; background: var(--se-blue-100); color: var(--se-blue); }
+  .chevron svg { width: 18px; height: 18px; }
+  .carte--maths:active .chevron { background: var(--se-blue); color: #fff; }
+  .etiquette { display: inline-flex; align-items: center; flex: 0 0 auto; height: 28px; padding: 0 11px; border-radius: 999px;
+    border: 1px solid var(--se-line); background: #fff; color: var(--se-ink-3); font-size: 12px; font-weight: 600; }
+  .carte--bientot h2 { color: var(--se-ink-2); }
+
+  .foot { display: none; }
+}
+/* assez de hauteur : un seul écran, sans défiler */
+@media (max-width: 759px) and (min-height: 480px) {
+  html, body { height: 100%; }
+  body { overflow: hidden; }
+  .app { height: 100dvh; min-height: 0; overflow: hidden; }
+}
+/* téléphone couché : la page défile, chaque carte garde une hauteur utile */
+@media (max-width: 759px) and (max-height: 479px) {
+  .matieres { grid-template-rows: auto; }
+  .carte { min-height: 220px; }
+}
+@media (max-width: 359px) {
+  .carte__body { padding: 2px 12px 12px 14px; }
+  .carte__body h2 { font-size: 17px; }
+}
+
+/* =============================================================
    8. ENTRÉE ORCHESTRÉE — une seule séquence
    ============================================================= */
 .js .reveal { opacity: 0; transform: translateY(10px); }
@@ -231,13 +311,14 @@ body::before {
     <p class="hero__context reveal" style="--d:60ms">ERA · TEBE · TMA</p>
     <h1 class="reveal" style="--d:120ms">Ton espace de révision</h1>
     <p class="hero__sub reveal" style="--d:200ms"><b>Maths &amp; Physique-Chimie.</b> Choisis la matière que tu veux travailler.</p>
+    <p class="hero__mobile reveal" style="--d:200ms">Choisis une matière pour commencer.</p>
   </header>
 
   <!-- ===================== LES DEUX MATIÈRES ===================== -->
   <main class="matieres" aria-label="Choisir une matière">
 
     <!-- ---------- MATHÉMATIQUES ---------- -->
-    <a class="carte reveal" style="--d:300ms" href="maths.html">
+    <a class="carte carte--maths reveal" style="--d:300ms" href="maths.html">
       <div class="carte__figure" aria-hidden="true">
         <svg viewBox="0 0 360 180" focusable="false">
           <defs>
@@ -279,8 +360,11 @@ body::before {
         </svg>
       </div>
       <div class="carte__body">
-        <h2>Mathématiques</h2>
-        <p>Fonctions · Calcul · Statistiques · Géométrie</p>
+        <div class="texte">
+          <h2>Mathématiques</h2>
+          <p>Fonctions · Calcul · Statistiques · Géométrie</p>
+        </div>
+        <span class="chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
         <span class="btn">Réviser les maths
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </span>
@@ -288,7 +372,7 @@ body::before {
     </a>
 
     <!-- ---------- PHYSIQUE-CHIMIE ---------- -->
-    <a class="carte reveal" style="--d:420ms" href="physique.html">
+    <div class="carte carte--physique carte--bientot reveal" style="--d:420ms" aria-disabled="true">
       <div class="carte__figure" aria-hidden="true">
         <svg viewBox="0 0 360 180" focusable="false">
           <rect class="fig-grid" width="360" height="180"/>
@@ -306,13 +390,16 @@ body::before {
         </svg>
       </div>
       <div class="carte__body">
-        <h2>Physique-Chimie</h2>
-        <p>Énergie · Ondes · Électricité · Matière</p>
-        <span class="btn">Réviser la physique-chimie
+        <div class="texte">
+          <h2>Physique-Chimie</h2>
+          <p>Énergie · Ondes · Électricité · Matière</p>
+        </div>
+        <span class="etiquette" aria-hidden="true">Bientôt</span>
+        <span class="btn">Bientôt disponible
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </span>
       </div>
-    </a>
+    </div>
 
   </main>
 
